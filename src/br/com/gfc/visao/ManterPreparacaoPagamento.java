@@ -147,9 +147,23 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jForNumPreparacao.setDocument(new DefineCampoInteiro());
         jForDataLiquidacaoDe.setDocument(new DefineCampoData());
         jForDataLiquidacaoAte.setDocument(new DefineCampoData());
-        cpp = new CPreparacaoPagamentos(conexao, su);
+        controladores();
         buscarTotalPortadores();
         buscarAgendamentos();
+    }
+
+    /**
+     * Instancia controllers
+     */
+    private void controladores() {
+        try {
+            cpp = new CPreparacaoPagamentos(conexao, su);
+            ctPortadores = new ConsultaTitulos(conexao);
+            ctTitulos = new ConsultaTitulos(conexao);
+        } catch (SQLException ex) {
+            Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     /**
@@ -169,11 +183,9 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         }
 
         try {
-            ctPortadores = new ConsultaTitulos(conexao);
-            ctPortadores.callProcedure(sqlPortadores, dtVctoIni, dtVctoFin, dtEmisIni, dtEmisFin, pagarReceberIni, pagarReceberFin, tipoLancametoIni, tipoLancametoFin, "AB", nome);
-            jTabPortadores.setModel(ctPortadores);
-            ctPortadores.ajustarTabela(jTabPortadores, 5, 5, 100, 5, 100, 30);
-            if (ctPortadores.getRowCount() > 0) {
+            if (ctPortadores.callProcedure(sqlPortadores, dtVctoIni, dtVctoFin, dtEmisIni, dtEmisFin, pagarReceberIni, pagarReceberFin, tipoLancametoIni, tipoLancametoFin, "AB", nome) > 0) {
+                jTabPortadores.setModel(ctPortadores);
+                ctPortadores.ajustarTabela(jTabPortadores, 5, 5, 100, 5, 100, 30);
                 moverLinha = true;
                 ctPortadores.totalizaPortadores();
                 jForTotTitReceber.setText(String.valueOf(ctPortadores.getTotTitulosRec()));
@@ -181,9 +193,13 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                 buscarTitulos();
             } else {
                 zerarTabelaTitulos(jTabTitulo);
+                zerarTabelaPortadores();
             }
         } catch (SQLException ex) {
             mensagemTela(String.format("%s", "Erro na busca do total por portadores!\n") + ex);
+        } catch (Exception e) {
+            mensagemTela("Erro gerarl do Sistema! " + Object.class.getName()
+                    + "\nErr: " + e);
         }
     }
 
@@ -197,7 +213,6 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         sqlTitulo = "call pr_titulosXportadorXtipoPagamento(?,?,?,?,?,?,?,?,?,?,?,?,?)";
         linhaTitulos = 0;
         try {
-            ctTitulos = new ConsultaTitulos(conexao);
             ctTitulos.callProcedure(sqlTitulo, dtVctoIni, dtVctoFin, dtEmisIni, dtEmisFin, pagarReceberIni, pagarReceberFin, tipoLancametoIni, tipoLancametoFin, "AB", nome, cdPorador, cdTipoPagamento, cdTipoMovimento);
             jTabTitulo.setModel(ctTitulos);
             intervaloTit = new boolean[jTabTitulo.getRowCount()];
@@ -1973,8 +1988,8 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
 
     private void jButBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButBuscarActionPerformed
         moverLinha = false;
-        zerarTabelaTitulos(jTabTitulo);
-        zerarTabelaPortadores();
+        //zerarTabelaTitulos(jTabTitulo);
+        //zerarTabelaPortadores();
         linhaPortadores = 0;
         linhaTitulos = 0;
         sqlTitulo = "select * from buscartitulos where Situacao between '" + situacaoIni

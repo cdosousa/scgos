@@ -14,7 +14,9 @@ import java.text.ParseException;
 import javax.swing.JOptionPane;
 
 /**
- * Esta classe extende a classe ConsultaModelo para, acrescentando os métodos getters/setters e modificando o método setQuery para totalização dos títulos
+ * Esta classe extende a classe ConsultaModelo para, acrescentando os métodos
+ * getters/setters e modificando o método setQuery para totalização dos títulos
+ *
  * @author Cristiano de Oliveira Sousa criado em 20/08/2018
  */
 public class ConsultaTitulos extends ConsultaModelo {
@@ -28,7 +30,9 @@ public class ConsultaTitulos extends ConsultaModelo {
 
     /**
      * Construtor padrão para chamada da classe
-     * @param conexao objeto contendo a instância de conexão do usuário com o banco de dados
+     *
+     * @param conexao objeto contendo a instância de conexão do usuário com o
+     * banco de dados
      * @throws SQLException retorna exeção caso ocorra erro
      */
     public ConsultaTitulos(Connection conexao) throws SQLException {
@@ -39,10 +43,14 @@ public class ConsultaTitulos extends ConsultaModelo {
     }
 
     /**
-     * Método para fazer a consulta no banco de dados através de uma query qualquer feito pelo usuário e retorna o modela da tabela
-     * @param query String contendo a select para ser execurada no banco de dados
+     * Método para fazer a consulta no banco de dados através de uma query
+     * qualquer feito pelo usuário e retorna o modela da tabela
+     *
+     * @param query String contendo a select para ser execurada no banco de
+     * dados
      * @throws SQLException Retorna uma Execeção do SQL caso ocorra erro
-     * @throws IllegalStateException Retorna uma exeção caso ocorra um erro geral
+     * @throws IllegalStateException Retorna uma exeção caso ocorra um erro
+     * geral
      */
     @Override
     public void setQuery(String query) throws SQLException, IllegalStateException {
@@ -53,7 +61,9 @@ public class ConsultaTitulos extends ConsultaModelo {
         resultSet = stmt.executeQuery(query);
         // obtém metadados para o resultSet
         metaData = resultSet.getMetaData();
-        totalizaTitulos();
+        if (getRowCount() > 0) {
+            totalizaTitulos();
+        }
         // determina o número de linhas em resultSet
         resultSet.last(); // move para a última linha
         numberOfRows = resultSet.getRow(); //obtém o número da linha
@@ -63,7 +73,9 @@ public class ConsultaTitulos extends ConsultaModelo {
 
     /**
      * Método para totalizar os títulos por fornecedores
-     * @throws SQLException retorna uma Execção do SQL caso ocorra erro na consulta
+     *
+     * @throws SQLException retorna uma Execção do SQL caso ocorra erro na
+     * consulta
      */
     public void totalizaPortadores() throws SQLException {
         int numLinha = 0;
