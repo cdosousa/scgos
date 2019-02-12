@@ -183,7 +183,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                 zerarTabelaTitulos(jTabTitulo);
             }
         } catch (SQLException ex) {
-            mensagemTela(String.format("%s", "Erro na busca do total por portadores!\n") + ex);
+            mensagemTela(String.format("%s", "Erro na busca do total por portadores!!\n") + ex);
         }
     }
 
