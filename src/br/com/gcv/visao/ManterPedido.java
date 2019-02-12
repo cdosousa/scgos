@@ -836,9 +836,11 @@ public class ManterPedido extends javax.swing.JFrame {
      * Método para cancelar pedido
      */
     private void cancelarPedido() {
+        cped.reabrirProposta(jForCdProposta.getText());
         sqlPed = "SELECT * FROM GCVPEDIDO WHERE CD_PEDIDO = '" + modped.getCdPedido()
                 + "'";
         jComSituacao.setSelectedIndex(0);
+        jForCdProposta.setText("");
         operPed = "A";
         salvarPedido(true);
         pesquisarPedido();

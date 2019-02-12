@@ -32,6 +32,7 @@ public class PedidoDAO {
     private PreparedStatement stmtPed;
     private PreparedStatement stmtItped;
     private PreparedStatement stmtAcab;
+    private PreparedStatement stmtProp;
     private ResultSet rsPed;
     private ResultSet rsItped;
     private ResultSet rsAcab;
@@ -329,7 +330,8 @@ public class PedidoDAO {
                 + "USUARIO_MODIFICACAO = ?,"
                 + "DATA_MODIFICACAO = ?,"
                 + "HORA_MODIFICACAO = ?,"
-                + "SITUACAO = ?"
+                + "SITUACAO = ?,"
+                + "CD_PROPOSTA = ?"
                 + " WHERE CD_PEDIDO = ?";
         if (ped.getValorProdutos() > 0) {
             if (ped.getValorServico() > 0) {
@@ -364,7 +366,8 @@ public class PedidoDAO {
             stmtPed.setString(18, ped.getDataModificacao());
             stmtPed.setString(19, ped.getHoraModificacao());
             stmtPed.setString(20, ped.getSituacao());
-            stmtPed.setString(21, ped.getCdPedido());
+            stmtPed.setString(21, ped.getCdProposta());
+            stmtPed.setString(22, ped.getCdPedido());
             stmtPed.execute();
             stmtPed.close();
             JOptionPane.showMessageDialog(null, "Pedido " + ped.getCdPedido() + " atualizado com sucesso!");
@@ -450,6 +453,29 @@ public class PedidoDAO {
                 JOptionPane.showMessageDialog(null, "Erro na atualização do Acabamento, informe o administrador do sistema!\nErr: " + ex);
             }
         }
+    }
+    
+    /**
+     * Método para atualizar reabrir proposta comercial
+     * @param sql
+     * @param cdProposta
+     * @param usuario
+     * @param data
+     * @param hora
+     * @return
+     * @throws SQLException 
+     */
+    public int reabrirProposta(String sql, String cdProposta, String usuario, String data, String hora) throws SQLException{
+        stmtProp = conexao.prepareStatement(sql);
+        stmtProp.setString(1, "");
+        stmtProp.setString(2, usuario);
+        stmtProp.setString(3, data);
+        stmtProp.setString(4, hora);
+        stmtProp.setString(5, "EN");
+        stmtProp.setString(6, cdProposta);
+        stmtProp.execute();
+        stmtProp.close();
+        return 1;
     }
 
     /**

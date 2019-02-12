@@ -584,7 +584,7 @@ public class CPedido {
         modlan.setUsuarioCadastro(su.getUsuarioConectado());
         modlan.setDataCadastro(dat.getData());
         modlan.setHoraCadastro(hs.getHora());
-        CLancamentos clan = new CLancamentos(conexao,su);
+        CLancamentos clan = new CLancamentos(conexao, su);
         try {
             clan.gerarLancamento(modlan, regPedAtual.getCdCondPagamento());
         } catch (SQLException ex) {
@@ -599,15 +599,41 @@ public class CPedido {
         CLancamentos clan = new CLancamentos(conexao, su);
         clan.alterarLancamento(regPedAtual.getCdPedido(), tipoLanc, "Re", regPedAtual.getCdCondPagamento());
     }
-    
+
     /**
      * Método para cancelar os lancamentos financeiro no pedido
+     *
      * @param nunLanc número de parcelas para serem canceladas
      * @return retorna zero se as parcelas foram canceladas com sucesso.
      */
-    public int cancelarFinanceiro(int nunLanc){
+    public int cancelarFinanceiro(int nunLanc) {
         CLancamentos clan = new CLancamentos(conexao, su);
-        return clan.cancelarLancamentos("PED",regPedAtual.getCdPedido(),"Re", "AB", nunLanc);
+        return clan.cancelarLancamentos("PED", regPedAtual.getCdPedido(), "Re", "AB", nunLanc);
+    }
+
+    /**
+     * Método para voltar status da proposta comercial
+     * @param cdProposta
+     * @return 
+     */
+    public int reabrirProposta(String cdProposta) {
+        DataSistema dat = new DataSistema();
+        dat.setData(data);
+        HoraSistema hs = new HoraSistema();
+        data = dat.getData();
+        String rp = "UPDATE GCVPROPOSTA SET CD_PEDIDO = ?,"
+                + "USUARIO_MODIFICACAO = ?,"
+                + "DATA_MODIFICACAO = ?,"
+                + "HORA_MODIFICACAO = ?,"
+                + "SITUACAO = ?"
+                + " WHERE CD_PROPOSTA = ?";
+        PedidoDAO pdao = new PedidoDAO(conexao);
+        try {
+            return pdao.reabrirProposta(rp, cdProposta, su.getUsuarioConectado(), data, hs.getHora());
+        } catch (SQLException ex) {
+            Logger.getLogger(CPedido.class.getName()).log(Level.SEVERE, null, ex);
+            return 0;
+        }
     }
 
     /**
