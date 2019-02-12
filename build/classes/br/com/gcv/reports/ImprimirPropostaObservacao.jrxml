@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="555" pageHeight="802" columnWidth="535" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="f564b88e-a5c6-41c4-b515-7e5f80b86370">
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="77"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="Proposta" class="java.lang.String">
+		<defaultValueExpression><![CDATA[00042]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Revisao" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select p1.cd_proposta as Proposta,
+	"" as Local,
+    "" as Qtde,
+    "" as UM,
+    p1.obs as Descricao,
+    "" as ValorUnitBruto,
+    "" as ValorUnitLiquido,
+    "" as PercDesc,
+    "" as ValorDesc,
+    "" as TotalBruto,
+    "" as TotalLiquido
+    
+from gcvproposta p1
+where p1.cd_proposta = $P{Proposta} and p1.cd_revisao = $P{Revisao}]]>
+	</queryString>
+	<field name="Proposta" class="java.lang.String"/>
+	<field name="Local" class="java.lang.String"/>
+	<field name="Qtde" class="java.lang.String">
+		<fieldDescription><![CDATA[quantidade necessário do item vinculado ao  Tipo de Verniz]]></fieldDescription>
+	</field>
+	<field name="UM" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Descricao" class="java.lang.String"/>
+	<field name="ValorUnitBruto" class="java.lang.String"/>
+	<field name="ValorUnitLiquido" class="java.lang.String"/>
+	<field name="PercDesc" class="java.lang.String"/>
+	<field name="ValorDesc" class="java.lang.String"/>
+	<field name="TotalBruto" class="java.lang.String"/>
+	<field name="TotalLiquido" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="29">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="94" y="-1" width="317" height="27" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true" uuid="63ea0f56-6666-4cdb-a3e5-81e2765ea1e0"/>
+				<box topPadding="5" leftPadding="2" bottomPadding="1" rightPadding="2">
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Descricao}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="-1" width="50" height="29" uuid="6e88cc85-e22d-460a-a74a-430a0747608f"/>
+				<box>
+					<leftPen lineWidth="2.0"/>
+					<bottomPen lineWidth="2.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement stretchType="RelativeToBandHeight" x="50" y="-1" width="43" height="29" uuid="86369ed8-2498-42fe-862d-ec48d7b4103e"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement stretchType="RelativeToBandHeight" x="93" y="-1" width="318" height="29" uuid="2a6a45d1-3e2a-4654-8dae-ebeadd097ab2"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement stretchType="RelativeToBandHeight" x="411" y="-1" width="62" height="29" uuid="74dc2f06-c589-47cc-93af-04d64b0bd213"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement stretchType="RelativeToBandHeight" x="473" y="-1" width="81" height="29" uuid="1c946e50-6d2e-488c-aba1-f8eb59b50621"/>
+				<box>
+					<bottomPen lineWidth="2.0"/>
+					<rightPen lineWidth="2.0"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="483" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="483" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="9c0b1629-5cb8-47ec-bf0f-26075bf1e127">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="CD_CONTRATO" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="CD_SEQUENCIA" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="CD_PEDIDO" class="java.lang.String"/>
+	<parameter name="LOCAL_RELATORIOS" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tipoSequencia" class="java.lang.String"/>
+	<parameter name="QUEBRA_LINHA" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="TITULO" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * 
+from gcvcontratoseqtexto as t
+where t.cd_contrato = $P{CD_CONTRATO} and t.cd_sequencia = $P{CD_SEQUENCIA}]]>
+	</queryString>
+	<field name="cd_contrato" class="java.lang.String">
+		<fieldDescription><![CDATA[Código Alphanumérico para o contrato]]></fieldDescription>
+	</field>
+	<field name="cd_sequencia" class="java.lang.Integer">
+		<fieldDescription><![CDATA[Sequencia do contrato]]></fieldDescription>
+	</field>
+	<field name="texto_longo" class="java.lang.String">
+		<fieldDescription><![CDATA[Título para a Sequencia do Contrato]]></fieldDescription>
+	</field>
+	<field name="usuario_cadastro" class="java.lang.String">
+		<fieldDescription><![CDATA[Usuario Responsável pelo cadastro]]></fieldDescription>
+	</field>
+	<field name="data_cadastro" class="java.sql.Date">
+		<fieldDescription><![CDATA[Data na qual o cadastro foi realizado]]></fieldDescription>
+	</field>
+	<field name="hora_cadastro" class="java.sql.Time">
+		<fieldDescription><![CDATA[Hora na qual o cadastro foi realizado]]></fieldDescription>
+	</field>
+	<field name="usuario_modificacao" class="java.lang.String">
+		<fieldDescription><![CDATA[Usuário responsável pelo modificação do cadastro]]></fieldDescription>
+	</field>
+	<field name="data_modificacao" class="java.sql.Date">
+		<fieldDescription><![CDATA[Data na qual o cadastro foi alterado]]></fieldDescription>
+	</field>
+	<field name="hora_modificacao" class="java.sql.Time">
+		<fieldDescription><![CDATA[Hora na qual o cadastro foi modificado]]></fieldDescription>
+	</field>
+	<field name="situacao" class="java.lang.String">
+		<fieldDescription><![CDATA[Situacão do contrato]]></fieldDescription>
+	</field>
+	<variable name="vTitulo" class="java.lang.String">
+		<variableExpression><![CDATA["<html><b>".concat($P{TITULO}).concat("</b>").concat($F{texto_longo}).concat("</html>")]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="21">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="0" y="0" width="483" height="20" isPrintWhenDetailOverflows="true" uuid="d46af1ed-41da-49f3-8f97-1bfa517f2bb4">
+					<printWhenExpression><![CDATA[$P{QUEBRA_LINHA}.equals("N")]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Justified" verticalAlignment="Top" markup="html">
+					<font isBold="false" isUnderline="false" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" tabStopWidth="100"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<html><b>".concat($P{TITULO}).concat("</b> ").concat($F{texto_longo}.trim()).concat("</html>")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="0" y="0" width="483" height="20" isPrintWhenDetailOverflows="true" uuid="d7a21ee9-32d4-4735-b34a-3d5443a89c63">
+					<printWhenExpression><![CDATA[$P{QUEBRA_LINHA}.equals("S")]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Justified" verticalAlignment="Top" markup="none">
+					<font isUnderline="false" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" tabStopWidth="100"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{texto_longo}.trim()]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="22">
+			<subreport isUsingCache="false">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="2" width="483" height="20" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="9878da3b-0115-496f-a5cf-de865f89df13">
+					<printWhenExpression><![CDATA[$P{tipoSequencia}.equals("02")]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="@cdPedido">
+					<subreportParameterExpression><![CDATA[$P{CD_PEDIDO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{LOCAL_RELATORIOS} + "ImprimirTextoDetalheContratoItens.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<summary>
+		<band height="2"/>
+	</summary>
+</jasperReport>

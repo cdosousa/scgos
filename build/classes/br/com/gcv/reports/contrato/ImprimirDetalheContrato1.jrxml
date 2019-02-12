@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="553" pageHeight="842" columnWidth="553" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="aca399c6-02e5-4598-bc24-468f75cc1c85">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="CD_CONTRATO" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LOCAL_RELATORIOS" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="CD_PEDIDO" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select * 
+from gcvcontratosequencia as s
+where s.cd_contrato = $P{CD_CONTRATO}
+order by s.cd_seqantecessora]]>
+	</queryString>
+	<field name="cd_contrato" class="java.lang.String">
+		<fieldDescription><![CDATA[Código Alphanumérico para o contrato]]></fieldDescription>
+	</field>
+	<field name="cd_sequencia" class="java.lang.Integer">
+		<fieldDescription><![CDATA[Sequencia do contrato]]></fieldDescription>
+	</field>
+	<field name="cd_sequenciapai" class="java.lang.Integer">
+		<fieldDescription><![CDATA[Sequencia pai para esta sequencia]]></fieldDescription>
+	</field>
+	<field name="tipo_sequencia" class="java.lang.String">
+		<fieldDescription><![CDATA[Tipo de Sequencia do contrato: 01-Qualificação / 02-Objeto / 03-Cláusula / 04-Parágrafo / 05-Item Parágrafo]]></fieldDescription>
+	</field>
+	<field name="cd_seqantecessora" class="java.lang.Integer">
+		<fieldDescription><![CDATA[Codigo da Sequencia do registro que antecede este registro.]]></fieldDescription>
+	</field>
+	<field name="titulo" class="java.lang.String">
+		<fieldDescription><![CDATA[Título para a Sequencia do Contrato]]></fieldDescription>
+	</field>
+	<field name="alinhamento_titulo" class="java.lang.String">
+		<fieldDescription><![CDATA[Informa como o título estará alinhado na página: C-Centralizado / D-Direita / E-Esquerda]]></fieldDescription>
+	</field>
+	<field name="possui_texto" class="java.lang.String">
+		<fieldDescription><![CDATA[Se a sequencia possui texto longo.]]></fieldDescription>
+	</field>
+	<field name="quebra_linha" class="java.lang.String">
+		<fieldDescription><![CDATA[Se o item terá quebra de linha entre o texto e o título: Sim / Não]]></fieldDescription>
+	</field>
+	<field name="usuario_cadastro" class="java.lang.String">
+		<fieldDescription><![CDATA[Usuario Responsável pelo cadastro]]></fieldDescription>
+	</field>
+	<field name="data_cadastro" class="java.sql.Date">
+		<fieldDescription><![CDATA[Data na qual o cadastro foi realizado]]></fieldDescription>
+	</field>
+	<field name="hora_cadastro" class="java.sql.Time">
+		<fieldDescription><![CDATA[Hora na qual o cadastro foi realizado]]></fieldDescription>
+	</field>
+	<field name="usuario_modificacao" class="java.lang.String">
+		<fieldDescription><![CDATA[Usuário responsável pelo modificação do cadastro]]></fieldDescription>
+	</field>
+	<field name="data_modificacao" class="java.sql.Date">
+		<fieldDescription><![CDATA[Data na qual o cadastro foi alterado]]></fieldDescription>
+	</field>
+	<field name="hora_modificacao" class="java.sql.Time">
+		<fieldDescription><![CDATA[Hora na qual o cadastro foi modificado]]></fieldDescription>
+	</field>
+	<field name="situacao" class="java.lang.String">
+		<fieldDescription><![CDATA[Situacão do contrato]]></fieldDescription>
+	</field>
+	<variable name="centralizacao" class="java.lang.String"/>
+	<variable name="impItens" class="java.lang.Boolean" incrementType="Group" incrementGroup="Sequencia">
+		<variableExpression><![CDATA[$F{tipo_sequencia}.equals(02)]]></variableExpression>
+		<initialValueExpression><![CDATA[false]]></initialValueExpression>
+	</variable>
+	<group name="Sequencia">
+		<groupExpression><![CDATA[$F{cd_sequencia}]]></groupExpression>
+		<groupHeader>
+			<band height="21" splitType="Immediate">
+				<textField>
+					<reportElement x="0" y="0" width="553" height="20" isRemoveLineWhenBlank="true" uuid="76ea738e-93f0-4314-b52f-f55aa1d9534a">
+						<printWhenExpression><![CDATA[$F{alinhamento_titulo}.concat($F{quebra_linha}).equals("ES")]]></printWhenExpression>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{titulo}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="0" width="553" height="20" isRemoveLineWhenBlank="true" uuid="c308c087-373b-4c00-a230-b32cf11ee1f3">
+						<printWhenExpression><![CDATA[$F{alinhamento_titulo}.concat($F{quebra_linha}).equals("CS")]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{titulo}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="553" height="20" isRemoveLineWhenBlank="true" uuid="93769afd-7ec8-4ffd-9afc-9425237f9738">
+						<printWhenExpression><![CDATA[$F{alinhamento_titulo}.concat($F{quebra_linha}).equals("DS")]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true" pdfEncoding="Identity-V" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{titulo}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<subreport isUsingCache="false">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="0" y="-1" width="553" height="20" isPrintWhenDetailOverflows="true" uuid="c2f0f9c1-7127-45c0-a2bf-cc22cee90df4"/>
+				<subreportParameter name="CD_CONTRATO">
+					<subreportParameterExpression><![CDATA[$F{cd_contrato}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="tipoSequencia">
+					<subreportParameterExpression><![CDATA[$F{tipo_sequencia}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="CD_PEDIDO">
+					<subreportParameterExpression><![CDATA[$P{CD_PEDIDO}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TITULO">
+					<subreportParameterExpression><![CDATA[$F{titulo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="CD_SEQUENCIA">
+					<subreportParameterExpression><![CDATA[$F{cd_sequencia}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="QUEBRA_LINHA">
+					<subreportParameterExpression><![CDATA[$F{quebra_linha}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOCAL_RELATORIOS">
+					<subreportParameterExpression><![CDATA[$P{LOCAL_RELATORIOS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{LOCAL_RELATORIOS} + "ImprimirTextoDetalheContrato2.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="483" pageHeight="842" columnWidth="441" leftMargin="28" rightMargin="14" topMargin="0" bottomMargin="0" uuid="3ad5d9c4-f689-4568-9dd8-52643a63df5c">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="@cdPedido" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="@contador" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[1]]></defaultValueExpression>
+	</parameter>
+	<parameter name="impItem" class="java.lang.Boolean">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select 
+    cast(char(@contador := @contador +1)  as char(2) char set utf8) as linha, 
+	format(i.quantidade, 2, 'de_DE') as Qtde,
+	i.cd_unidmedida as UM,
+    ifnull(concat(s.descricao_comercial," ",aa.descricao_comercial),s.descricao_comercial) as Descricao,
+    format(i.valor_unit_bruto, 2, 'de_DE') as ValorUnitBruto,
+    format(i.valor_unit_liquido, 2, 'de_DE') as ValorUnitLiquido,
+    format(i.perc_desc, 3, 'de_DE') as PercDesc,
+    format(i.valor_desc, 2, 'de_DE') as ValorDesc,
+    format(i.total_item_bruto, 2, 'de_DE') as TotalBruto,
+    format(i.total_item_liquido, 2, 'de_DE') as TotalLiquido,
+    "S" as Tipo
+from (select @contador := 64) as nada, gcvitempedido as i
+join gsmservico as s on i.cd_material = s.cd_material and s.situacao = 'A'
+left outer join gcvacabamentoitemped as a on i.cd_pedido = a.cd_pedido and i.sequencia = a.sequencia
+left outer join gcsmaterial as aa on a.cd_material = aa.cd_material
+
+where i.cd_pedido = $P{@cdPedido}
+
+union all
+select 
+   cast(char(@contador := @contador +1)  as char(2) char set utf8) as linha,  
+	format(i.quantidade, 2,'de_DE') as Qtde,
+	i.cd_unidmedida as UM,
+    ifnull(concat(m.nome_material," ",aa1.descricao_comercial),m.nome_material) as Descricao,
+    format(i.valor_unit_bruto, 2, 'de_DE') as ValorUnitBruto,
+    format(i.valor_unit_liquido, 2, 'de_DE') as ValorUnitLiquido,
+    format(i.perc_desc, 3, 'de_DE') as PercDesc,
+    format(i.valor_desc, 2, 'de_DE') as ValorDesc,
+    format(i.total_item_bruto, 2, 'de_DE') as TotalBruto,
+    format(i.total_item_liquido, 2, 'de_DE') as TotalLiquido,
+    "M" as Tipo
+from (select @contador := 64) as nada, gcvitempedido as i
+join gcsmaterial as m on i.cd_material = m.cd_material and m.tipo_produto <> 'S'
+left outer join gcvacabamentoitemped as a1 on i.cd_pedido = a1.cd_pedido and i.sequencia = a1.sequencia
+left outer join gcsmaterial as aa1 on a1.cd_material = aa1.cd_material
+
+where i.cd_pedido = $P{@cdPedido}]]>
+	</queryString>
+	<field name="linha" class="java.lang.String"/>
+	<field name="Qtde" class="java.lang.String">
+		<fieldDescription><![CDATA[quantidade necessário do item vinculado ao  Tipo de Verniz]]></fieldDescription>
+	</field>
+	<field name="UM" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Descricao" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ValorUnitBruto" class="java.lang.String"/>
+	<field name="ValorUnitLiquido" class="java.lang.String"/>
+	<field name="PercDesc" class="java.lang.String"/>
+	<field name="ValorDesc" class="java.lang.String"/>
+	<field name="TotalBruto" class="java.lang.String"/>
+	<field name="TotalLiquido" class="java.lang.String"/>
+	<field name="Tipo" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<variable name="vLinha" class="java.lang.Integer" resetType="None" calculation="Count">
+		<variableExpression><![CDATA[$V{vLinha}.sum($V{vLinha},$P{@contador})]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<group name="incremente">
+		<groupExpression><![CDATA[$F{linha}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="20">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="47" y="0" width="394" height="20" isRemoveLineWhenBlank="true" uuid="a238d38f-f08a-4639-8ae2-1cd50705009e">
+					<printWhenExpression><![CDATA[$F{UM}.equals("M²")]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA[$F{Descricao}.concat(" em ").concat($F{Qtde}).concat($F{UM})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="26" height="20" uuid="324ae539-911a-4bff-a033-4c4ff24e8036"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{linha}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="26" y="0" width="21" height="20" uuid="24872917-98e5-4307-8e60-48b62109a042"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[)]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="47" y="0" width="394" height="20" isRemoveLineWhenBlank="true" uuid="eea2f5d7-0efe-47eb-8ca1-40a350ecc6e3">
+					<printWhenExpression><![CDATA[$F{UM}.equals("UN")]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA[$F{Descricao}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="47" y="0" width="394" height="20" isRemoveLineWhenBlank="true" uuid="ec6a161b-7ac2-4273-8a64-cc0bb2028974">
+					<printWhenExpression><![CDATA[$F{UM}.equals("PC")]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Justified"/>
+				<textFieldExpression><![CDATA[$F{Descricao}.concat(" (").concat($F{Qtde}).concat(" ").concat($F{UM}).concat(" )")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="47" y="0" width="394" height="20" isRemoveLineWhenBlank="true" uuid="6edffdba-aa7c-4dcd-81db-a776be159bd9">
+					<printWhenExpression><![CDATA[$F{UM}.equals("M")]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Justified">
+					<font isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Descricao}.concat(" em ").concat($F{Qtde}).concat($F{UM})]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

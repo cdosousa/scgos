@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<parameter name="CD_PROPOSTA_INI" class="java.lang.String">
+		<defaultValueExpression><![CDATA["00032"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="CD_PROPOSTA_FIM" class="java.lang.String">
+		<defaultValueExpression><![CDATA["00032"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LOGOTIPO" class="java.lang.String"/>
+	<parameter name="SITE_EMPRESA" class="java.lang.String"/>
+	<parameter name="EMAIL" class="java.lang.String"/>
+	<parameter name="TELEFONES" class="java.lang.String"/>
+	<parameter name="RAZAOSOCIAL" class="java.lang.String"/>
+	<parameter name="CNPJ" class="java.lang.String"/>
+	<parameter name="LOCAL_RELATORIOS" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{LOCAL_RELATORIOS}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="RODAPE" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select p.cd_proposta as Proposta,
+	p.nome_cliente as Nome,
+	p.logradouro as Endereco,
+    p.complmento as Complemento,
+    p.numero as Numero,
+    p.Bairro as Bairro,
+    m.nome_municipio as Cidade,
+    p.sigla_uf as UF,
+    p.cep as CEP,
+    p.telefone as Telefone,
+    p.celular as Celular,
+    p.email as Email,
+    format(valor_servicos,2,'de_DE') as 'ValorServico',
+    format(valor_produtos,2,'de_DE') as 'ValorProduto',
+    format(valor_adicionais,2,'de_DE') as 'ValorAdicionais',
+    format(p.valor_descontos,2,'de_DE') as 'ValorDescontos',
+    format(p.valor_outros_descontos,2,'de_DE') as 'ValorOutrosDescontos',
+    format(p.valor_total_bruto,2,'de_DE') as 'ValorTotalBruto',
+    format(p.valor_total_liquido,2,'de_DE') as 'ValorTotalLiquido',
+    format(p.valor_descontos + p.valor_outros_descontos,2,'de_DE') as 'TotalDescontos',
+    t.nome_tipo_pagamento as Pagamento,
+    c.nome_condpag as Condicao,
+    c.num_parcelas as Parcelas,
+    format(p.valor_total_liquido / c.num_parcelas,2,'de_DE') as Valor_Parcela,
+    v.nome_tecnico as Vendas,
+    te.nome_tecnico as Tecnico,
+    p.prazo_execucao as PrazoExecucao,
+    p.obs as Observacao
+   
+from gcvproposta as p
+left outer join pgsmunicipio as m on p.cd_municipio_ibge = m.cd_municipio_ibge
+left outer join gfctipopagamento as t on p.cd_tipopagamento = t.cd_tipopagamento
+left outer join gfccondicaopagamento as c on p.cd_condpag = c.cd_condpag
+left outer join gsmtecnicos as v on p.cd_vendedor = v.cpf
+left outer join gsmtecnicos as te on p.cd_tecnico = te.cpf
+
+where p.cd_proposta between $P{CD_PROPOSTA_INI} and $P{CD_PROPOSTA_FIM}]]>
+	</queryString>
+	<field name="Proposta" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Nome" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Endereco" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Complemento" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Numero" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Bairro" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Cidade" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="UF" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CEP" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Telefone" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Celular" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Email" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ValorServico" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ValorProduto" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ValorAdicionais" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ValorDescontos" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ValorOutrosDescontos" class="java.lang.String"/>
+	<field name="ValorTotalBruto" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ValorTotalLiquido" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TotalDescontos" class="java.lang.String"/>
+	<field name="Pagamento" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Condicao" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Parcelas" class="java.lang.Long">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Valor_Parcela" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Vendas" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Tecnico" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="PrazoExecucao" class="java.lang.String"/>
+	<field name="Observacao" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="132">
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="344" y="82" width="103" height="17"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{CNPJ}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="183" y="31" width="264" height="17"/>
+				<textElement textAlignment="Right">
+					<font size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{EMAIL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement isPrintRepeatedValues="false" x="276" y="82" width="68" height="17"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[C.N.P.J:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="359" y="99" width="88" height="31"/>
+				<textElement textAlignment="Right">
+					<font size="24"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Proposta}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="183" y="65" width="264" height="17"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{RAZAOSOCIAL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="183" y="0" width="264" height="31"/>
+				<textElement textAlignment="Right">
+					<font size="24" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{SITE_EMPRESA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="183" y="48" width="264" height="17"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{TELEFONES}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement isPrintRepeatedValues="false" x="108" y="99" width="251" height="31"/>
+				<textElement textAlignment="Right">
+					<font size="24" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Proposta Comercial]]></text>
+			</staticText>
+			<image>
+				<reportElement isPrintRepeatedValues="false" x="4" y="12" width="163" height="83"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{LOGOTIPO}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="89">
+			<rectangle>
+				<reportElement x="0" y="0" width="555" height="88"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="4" y="0" width="40" height="17"/>
+				<textElement/>
+				<text><![CDATA[Cliente:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="17" width="50" height="17"/>
+				<textElement/>
+				<text><![CDATA[Endereço:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="34" width="40" height="17"/>
+				<textElement/>
+				<text><![CDATA[Bairro:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="51" width="40" height="17"/>
+				<textElement/>
+				<text><![CDATA[C.E.P.:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="68" width="40" height="17"/>
+				<textElement/>
+				<text><![CDATA[e-mail:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="44" y="0" width="421" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Nome}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="54" y="17" width="241" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Endereco}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="295" y="17" width="39" height="17"/>
+				<textElement/>
+				<text><![CDATA[Compl.:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="334" y="17" width="131" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Complemento}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="465" y="17" width="32" height="17"/>
+				<textElement/>
+				<text><![CDATA[Núm.:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="497" y="17" width="52" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Numero}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="44" y="34" width="224" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Bairro}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="268" y="34" width="42" height="17"/>
+				<textElement/>
+				<text><![CDATA[Cidade:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="310" y="34" width="177" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Cidade}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="487" y="34" width="29" height="17"/>
+				<textElement/>
+				<text><![CDATA[U.F.:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="516" y="34" width="33" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{UF}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="44" y="51" width="100" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{CEP}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="144" y="51" width="50" height="17"/>
+				<textElement/>
+				<text><![CDATA[Telefone:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="194" y="51" width="100" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Telefone}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="295" y="51" width="39" height="17"/>
+				<textElement/>
+				<text><![CDATA[Celular:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="334" y="51" width="100" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Celular}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="50" y="68" width="505" height="17"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Email}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="5"/>
+	</columnHeader>
+	<detail>
+		<band height="40">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="39"/>
+				<subreportParameter name="Proposta">
+					<subreportParameterExpression><![CDATA[$F{Proposta}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{LOCAL_RELATORIOS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOCAL_RELATORIOS">
+					<subreportParameterExpression><![CDATA[$P{LOCAL_RELATORIOS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "ImprimirPropostaLocal.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="51">
+			<image scaleImage="FillFrame" isLazy="true">
+				<reportElement isPrintRepeatedValues="false" x="10" y="4" width="541" height="44" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{RODAPE}]]></imageExpression>
+			</image>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="247">
+			<textField isBlankWhenNull="true">
+				<reportElement x="474" y="-1" width="81" height="20"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ValorTotalBruto}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="474" y="59" width="81" height="20"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{Parcelas}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="474" y="79" width="81" height="20"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Valor_Parcela}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="474" y="39" width="81" height="20"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ValorTotalLiquido}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="412" y="-1" width="62" height="20"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="374" y="20" width="100" height="20"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Descontos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="374" y="39" width="100" height="20"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Proposta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="374" y="59" width="100" height="20"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Parcela(s)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="374" y="79" width="100" height="20"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Parcela(s)]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="474" y="19" width="81" height="20"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{TotalDescontos}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="28" y="19" width="90" height="20"/>
+				<textElement/>
+				<text><![CDATA[Prazo de Execução:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="28" y="40" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Forma de Pagamento:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="28" y="60" width="116" height="20"/>
+				<textElement/>
+				<text><![CDATA[Condição de Pagamento:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="28" y="79" width="331" height="20"/>
+				<textElement/>
+				<text><![CDATA[Validade da Proposta: 15 Dias]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="28" y="99" width="26" height="20"/>
+				<textElement/>
+				<text><![CDATA[Data:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="28" y="119" width="41" height="20"/>
+				<textElement/>
+				<text><![CDATA[Vendas:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="318" y="119" width="41" height="20"/>
+				<textElement/>
+				<text><![CDATA[Técnico:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="118" y="19" width="241" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{PrazoExecucao}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="128" y="40" width="231" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Pagamento}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="144" y="60" width="215" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Condicao}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="54" y="99" width="305" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="69" y="119" width="241" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Vendas}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="359" y="119" width="190" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Tecnico}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="0" y="145" width="555" height="101"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="145" width="551" height="26"/>
+				<box topPadding="0" leftPadding="3" bottomPadding="0"/>
+				<textElement/>
+				<text><![CDATA[OBS.: * A Abertura / trincamento do calafeto ocorre em virtude da movimentação natural da madeira, umidade relativa do ar, mudança de teperatura. Este fenomeno natural, está fora de controle de nossa mão de obra e do material utilizado.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="171" width="551" height="15"/>
+				<box topPadding="1" leftPadding="3" bottomPadding="1"/>
+				<textElement/>
+				<text><![CDATA[* PINTURA - recomendamos deixar a ultima demão de tinta para depois do piso pronto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="186" width="551" height="15"/>
+				<box topPadding="1" leftPadding="3" bottomPadding="1"/>
+				<textElement/>
+				<text><![CDATA[* MÓVEIS - o local deve estar sem móveis, curtinas, etc.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="201" width="551" height="15"/>
+				<box topPadding="1" leftPadding="3" bottomPadding="1"/>
+				<textElement/>
+				<text><![CDATA[* MADEIRA - após a instalação é necessário esperar de 15 a 20 dias para dar início a raspagem.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="216" width="551" height="15"/>
+				<box topPadding="1" leftPadding="3" bottomPadding="1"/>
+				<textElement/>
+				<text><![CDATA[* METRAGEM MÍNIMA: 30m2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="231" width="551" height="15"/>
+				<box topPadding="1" leftPadding="3" bottomPadding="1"/>
+				<textElement/>
+				<text><![CDATA[* ETAPAS - para realizar o serviço em etapas é cobrado uma taxa por etapas.]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

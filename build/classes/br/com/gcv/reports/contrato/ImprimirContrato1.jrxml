@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="483" leftMargin="70" rightMargin="42" topMargin="40" bottomMargin="56" uuid="0e829c5d-fada-4e9d-83b1-10d91c97b7d7">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="CD_CONTRATO_INI" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="CD_CONTRATO_FIM" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LOGOTIPO" class="java.lang.String"/>
+	<parameter name="RODAPE" class="java.lang.String"/>
+	<parameter name="SITE_EMPRESA" class="java.lang.String"/>
+	<parameter name="EMAIL" class="java.lang.String"/>
+	<parameter name="TELEFONES" class="java.lang.String"/>
+	<parameter name="LOCAL_RELATORIOS" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="PGSEMPNOME" class="java.lang.String"/>
+	<parameter name="PGSEMPCNPJ" class="java.lang.String"/>
+	<parameter name="GCVCLINOME" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT C.CD_CONTRATO AS contrato,
+       C.CD_PEDIDO AS pedido
+FROM GCVCONTRATO AS C
+WHERE C.CD_CONTRATO BETWEEN $P{CD_CONTRATO_INI} AND $P{CD_CONTRATO_FIM}]]>
+	</queryString>
+	<field name="contrato" class="java.lang.String"/>
+	<field name="pedido" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="159" splitType="Stretch">
+			<image scaleImage="RealSize">
+				<reportElement isPrintRepeatedValues="false" x="0" y="0" width="181" height="96" uuid="261f1740-b1c9-4163-9435-ad1174418aee"/>
+				<imageExpression><![CDATA[$P{LOGOTIPO}]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="207" y="0" width="264" height="31" uuid="6e1fe10e-784f-45b6-a853-2d2b5849c569"/>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri" size="24" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{SITE_EMPRESA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="207" y="31" width="264" height="17" uuid="88935f08-e0ee-40c1-a62d-f43fcfd5f0e3"/>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{EMAIL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="207" y="48" width="264" height="17" uuid="1940501a-d6b6-4806-9381-8108b24deff1"/>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TELEFONES}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="207" y="65" width="264" height="17" uuid="9cb41f11-ba4e-45b3-be0e-c819a93c3b08"/>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PGSEMPNOME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement isPrintRepeatedValues="false" x="300" y="82" width="68" height="17" uuid="4f0606be-0c16-41d0-bfdd-eb256a2e753a"/>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri"/>
+				</textElement>
+				<text><![CDATA[C.N.P.J:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="368" y="82" width="103" height="17" uuid="cad7f606-ad9c-4ba4-bcbf-5df8e54c54cf"/>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PGSEMPCNPJ}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="106" width="483" height="46" uuid="13f2397a-6e51-43f0-862f-372340276f19"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[INSTRUMENTO PARTICULAR DE PRESTAÇÃO DE SERVIÇOS]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="31" splitType="Stretch">
+			<subreport isUsingCache="true" runToBottom="false">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="2" width="483" height="27" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="8c59e3bf-75c0-4532-8a50-f3d1009bc640"/>
+				<subreportParameter name="CD_CONTRATO">
+					<subreportParameterExpression><![CDATA[$P{CD_CONTRATO_INI}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="CD_PEDIDO">
+					<subreportParameterExpression><![CDATA[$F{pedido}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOCAL_RELATORIOS">
+					<subreportParameterExpression><![CDATA[$P{LOCAL_RELATORIOS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{LOCAL_RELATORIOS} + "ImprimirDetalheContrato1.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="83">
+			<image scaleImage="RealSize">
+				<reportElement x="0" y="0" width="483" height="83" uuid="11a152b4-47d2-4a1d-bb79-c4b1d474054b"/>
+				<imageExpression><![CDATA[$P{RODAPE}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="374" y="14" width="100" height="20" uuid="5ae57bd8-d87e-477f-a9cf-f51fef645521"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="184">
+			<textField>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="77" width="260" height="20" uuid="f0de44c8-1c76-4c50-bf62-c96c42c4dc03"/>
+				<textFieldExpression><![CDATA[$P{PGSEMPNOME}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="3" y="70" width="257" height="1" uuid="28805d0b-18f8-406c-85a2-d1b4f46f1ff3"/>
+			</line>
+			<textField>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="3" y="138" width="257" height="20" uuid="5f34096f-a10c-44e8-8ae2-0e6761bac5fa"/>
+				<textFieldExpression><![CDATA[$P{GCVCLINOME}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="3" y="131" width="257" height="1" uuid="d115e05b-16c7-413e-b7d0-068e70e320fc"/>
+			</line>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="326" y="44" width="100" height="20" uuid="5a088341-21b7-4480-9376-6a5ebf5f6cf1"/>
+				<text><![CDATA[Testemunhas]]></text>
+			</staticText>
+			<line>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="326" y="70" width="145" height="1" uuid="c8247ce6-970a-454e-8d75-651ea16c6868"/>
+			</line>
+			<line>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="326" y="131" width="145" height="1" uuid="44c24c5c-9bdb-46fb-804d-5cba950c9e5f"/>
+			</line>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="308" y="54" width="15" height="17" uuid="031726ec-e790-4c31-b30c-f14998b8d9b7"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="308" y="115" width="15" height="17" uuid="6bfe96e0-3d9f-4012-a23d-14d359ddc58d"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="181" y="13" width="40" height="20" uuid="39fdf5d6-067c-48fb-ae11-c7b5dbc3ca5d"/>
+				<text><![CDATA[Barueri, ]]></text>
+			</staticText>
+			<textField pattern="dd &apos;de&apos; MMMMM &apos;de&apos; yyy">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="223" y="13" width="189" height="20" uuid="fc5eeebe-8e4e-40ed-a22f-1657274a8c7b"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

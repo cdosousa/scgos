@@ -1,0 +1,659 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e05d0225-c1f1-411a-a3c3-325ffb28bf67">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="CD_PROPOSTA_INI" class="java.lang.String">
+		<defaultValueExpression><![CDATA["00032"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="CD_PROPOSTA_FIM" class="java.lang.String">
+		<defaultValueExpression><![CDATA["00032"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="CD_REVISAO" class="java.lang.String">
+		<defaultValueExpression><![CDATA["0"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LOGOTIPO" class="java.lang.String"/>
+	<parameter name="SITE_EMPRESA" class="java.lang.String"/>
+	<parameter name="EMAIL" class="java.lang.String"/>
+	<parameter name="TELEFONES" class="java.lang.String"/>
+	<parameter name="RAZAOSOCIAL" class="java.lang.String"/>
+	<parameter name="CNPJ" class="java.lang.String"/>
+	<parameter name="LOCAL_RELATORIOS" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{LOCAL_RELATORIOS}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="RODAPE" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select p.cd_proposta as Proposta,
+          p.cd_revisao as Revisao,
+	p.nome_cliente as Nome,
+	p.logradouro as Endereco,
+    p.complemento as Complemento,
+    p.numero as Numero,
+    p.Bairro as Bairro,
+    m.nome_municipio as Cidade,
+    p.sigla_uf as UF,
+    p.cep as CEP,
+    p.telefone as Telefone,
+    p.celular as Celular,
+    p.email as Email,
+    format(valor_servicos,2,'de_DE') as 'ValorServico',
+    format(valor_produtos,2,'de_DE') as 'ValorProduto',
+    format(valor_adicionais,2,'de_DE') as 'ValorAdicionais',
+    format(p.valor_descontos,2,'de_DE') as 'ValorDescontos',
+    format(p.valor_outros_descontos,2,'de_DE') as 'ValorOutrosDescontos',
+    format(p.valor_total_bruto,2,'de_DE') as 'ValorTotalBruto',
+    format(p.valor_total_liquido,2,'de_DE') as 'ValorTotalLiquido',
+    format(p.valor_descontos + p.valor_outros_descontos,2,'de_DE') as 'TotalDescontos',
+    t.nome_tipo_pagamento as Pagamento,
+    c.nome_condpag as Condicao,
+    c.num_parcelas as Parcelas,
+    format(p.valor_total_liquido / c.num_parcelas,2,'de_DE') as Valor_Parcela,
+    v.nome_tecnico as Vendas,
+    te.nome_tecnico as Tecnico,
+    p.prazo_execucao as PrazoExecucao,
+    p.obs as Observacao,
+    date_format(str_to_date(p.data_envio,'%Y-%m-%d'),'%d/%m/%Y') as Envio
+   
+from gcvproposta as p
+left outer join pgsmunicipio as m on p.cd_municipio_ibge = m.cd_municipio_ibge
+left outer join gfctipopagamento as t on p.cd_tipopagamento = t.cd_tipopagamento
+left outer join gfccondicaopagamento as c on p.cd_condpag = c.cd_condpag
+left outer join gsmtecnicos as v on p.cd_vendedor = v.cpf
+left outer join gsmtecnicos as te on p.cd_tecnico = te.cpf
+
+where p.cd_proposta between $P{CD_PROPOSTA_INI} and $P{CD_PROPOSTA_FIM}
+and p.cd_revisao = $P{CD_REVISAO}]]>
+	</queryString>
+	<field name="Proposta" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Revisao" class="java.lang.String"/>
+	<field name="Nome" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Endereco" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Complemento" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Numero" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Bairro" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Cidade" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="UF" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CEP" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Telefone" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Celular" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Email" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ValorServico" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ValorProduto" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ValorAdicionais" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ValorDescontos" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ValorOutrosDescontos" class="java.lang.String"/>
+	<field name="ValorTotalBruto" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ValorTotalLiquido" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TotalDescontos" class="java.lang.String"/>
+	<field name="Pagamento" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Condicao" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Parcelas" class="java.lang.Long">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Valor_Parcela" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Vendas" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Tecnico" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="PrazoExecucao" class="java.lang.String"/>
+	<field name="Observacao" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Envio" class="java.lang.String"/>
+	<variable name="Rev" class="java.lang.String">
+		<variableExpression><![CDATA[($F{Revisao} == "0"?"X":"-"+$F{Revisao})]]></variableExpression>
+	</variable>
+	<title>
+		<band height="225">
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="374" y="82" width="73" height="17" uuid="77f46190-7d1a-4cc8-94a3-b3d23bdd0bc0"/>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CNPJ}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="183" y="31" width="264" height="17" uuid="bf82cdee-e262-449b-876b-20d17bac3658"/>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri" size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{EMAIL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="359" y="101" width="126" height="31" uuid="fea5a194-807e-468e-a3a6-4667c672107c"/>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri" size="22"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Proposta}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="183" y="65" width="264" height="17" uuid="4f910833-18cc-42f6-a45d-813ee303f178"/>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{RAZAOSOCIAL}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="183" y="0" width="264" height="31" uuid="b710d7ae-5e62-4e62-ad4d-42acbe897ab0"/>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri" size="24" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{SITE_EMPRESA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement isPrintRepeatedValues="false" x="183" y="48" width="264" height="17" uuid="b0312ac7-b2bd-48cb-8735-1d694c6a62be"/>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TELEFONES}]]></textFieldExpression>
+			</textField>
+			<image scaleImage="RealSize">
+				<reportElement isPrintRepeatedValues="false" x="2" y="3" width="181" height="96" uuid="13e5ce41-ca5d-40eb-8ae2-1247f775a409"/>
+				<imageExpression><![CDATA[$P{LOGOTIPO}]]></imageExpression>
+			</image>
+			<rectangle>
+				<reportElement x="0" y="135" width="555" height="89" uuid="c89c9bc8-606a-44d4-9a30-455f863dec91"/>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="326" y="156" width="52" height="17" uuid="b22061d8-2ad7-42a1-8d10-de82fad29c53"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Numero}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="417" y="156" width="131" height="17" uuid="4d322694-79ce-4961-bd0c-2d792f9f4ca7"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Complemento}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="190" width="40" height="17" uuid="955e473f-29c0-4782-bc93-9d914831cf84"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<text><![CDATA[C.E.P.:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="44" y="190" width="100" height="17" uuid="c9578bb6-b501-4645-8666-f8767192a27f"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CEP}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="334" y="190" width="100" height="17" uuid="e4613306-b62d-4676-98f2-9861a6584017"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Celular}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="144" y="190" width="50" height="17" uuid="270b1354-8e18-4d23-b605-ff301cd26382"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<text><![CDATA[Telefone:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="194" y="190" width="100" height="17" uuid="682fbb45-cac1-4f11-bcf6-3d709cf5c631"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Telefone}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="516" y="173" width="33" height="17" uuid="05e82e7a-e54f-40ee-b0d8-0e4a19816233"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{UF}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="44" y="173" width="224" height="17" uuid="a6909a4a-c631-4ce9-afa5-c080417e3c50"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Bairro}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="207" width="40" height="17" uuid="8f61fd09-c2d6-498b-af20-3efec53db405"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<text><![CDATA[e-mail:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="156" width="50" height="17" uuid="866a2332-986d-4ddb-9988-2cac6b69fc71"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<text><![CDATA[Endereço:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="294" y="156" width="32" height="17" uuid="eacd394f-c2da-42e3-8d35-19573da4b1af"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<text><![CDATA[Núm.:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="173" width="40" height="17" uuid="eb2e288c-463b-480c-822e-e5a21292fc5e"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<text><![CDATA[Bairro:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="50" y="207" width="505" height="17" uuid="51fd8d34-57eb-4d5b-83ad-e95b23c12b71"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Email}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="378" y="156" width="39" height="17" uuid="f0db8fb9-43e2-48d9-b457-32352fc05dc7"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<text><![CDATA[Compl.:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="487" y="173" width="29" height="17" uuid="9b882b62-78f9-43fc-a395-a74940a3e4c6"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<text><![CDATA[U.F.:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="268" y="173" width="42" height="17" uuid="1ffa2371-5ddf-4d32-89b1-121d23a5dbd3"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<text><![CDATA[Cidade:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="310" y="173" width="177" height="17" uuid="3b9bbec5-78e4-4af9-a3eb-f22322675bb3"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Cidade}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="56" y="156" width="237" height="17" uuid="ec64453d-e13f-42f8-bdef-140bda6e144a"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Endereco}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="138" width="40" height="17" uuid="f560e902-bf6c-4d13-bfb4-7cde8114c895"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<text><![CDATA[Cliente:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="48" y="138" width="421" height="17" uuid="b553bf2a-ff32-4622-b294-63ad7e16d296"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Nome}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="144" y="101" width="215" height="31" uuid="bca5d184-7caa-405a-8ea1-1e9f12460745"/>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri" size="22"/>
+				</textElement>
+				<text><![CDATA[Proposta Comercial]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="295" y="190" width="39" height="17" uuid="1340c504-7c14-4f6d-9d2c-d9a7042c072f"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<text><![CDATA[Celular:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="487" y="101" width="63" height="31" uuid="0e33edf9-d84b-4249-97cb-1195c74320bb"/>
+				<textElement>
+					<font fontName="Calibri" size="22"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{Revisao}.equals("0") ? "" : " - "+$F{Revisao})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="326" y="82" width="44" height="17" uuid="0c7ed453-8174-4dc0-b882-2c2c1c88a924"/>
+				<textElement textAlignment="Right">
+					<font fontName="Calibri"/>
+				</textElement>
+				<text><![CDATA[C.N.P.J:]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="39">
+			<subreport>
+				<reportElement positionType="Float" x="0" y="0" width="555" height="39" uuid="9a51f5c0-19e8-4668-9dd8-831b58ae2098"/>
+				<subreportParameter name="Revisao">
+					<subreportParameterExpression><![CDATA[$F{Revisao}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="Proposta">
+					<subreportParameterExpression><![CDATA[$F{Proposta}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOCAL_RELATORIOS">
+					<subreportParameterExpression><![CDATA[$P{LOCAL_RELATORIOS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{LOCAL_RELATORIOS} + "ImprimirPropostaLocal.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="81">
+			<image scaleImage="RealSize">
+				<reportElement positionType="Float" isPrintRepeatedValues="false" x="0" y="0" width="553" height="81" uuid="35fcc70a-9ad8-4c5c-8312-820934990897"/>
+				<imageExpression><![CDATA[$P{RODAPE}]]></imageExpression>
+			</image>
+		</band>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="178">
+			<image scaleImage="RealSize">
+				<reportElement positionType="FixRelativeToBottom" isPrintRepeatedValues="false" x="0" y="97" width="553" height="81" uuid="376decd2-ed90-4e54-beef-f55141291a3d"/>
+				<imageExpression><![CDATA[$P{RODAPE}]]></imageExpression>
+			</image>
+			<rectangle>
+				<reportElement positionType="Float" x="2" y="1" width="553" height="93" uuid="9358fe22-3ed6-4d87-9747-d4f0aadb5e1e"/>
+			</rectangle>
+			<staticText>
+				<reportElement positionType="Float" x="2" y="38" width="551" height="13" uuid="2b2508c7-05e1-4322-86dd-02dd10394261"/>
+				<box topPadding="1" leftPadding="3" bottomPadding="1"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<text><![CDATA[* MÓVEIS - o local deve estar sem móveis, curtinas, etc.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="2" y="53" width="551" height="13" uuid="45944ef2-e37b-43c8-af34-2f4ebf543a6f"/>
+				<box topPadding="1" leftPadding="3" bottomPadding="1"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<text><![CDATA[* MADEIRA - após a instalação é necessário esperar de 15 a 20 dias para dar início a raspagem.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="2" y="0" width="551" height="22" uuid="02fc26f2-b63a-45ea-bcb9-b1c593bfb074"/>
+				<box topPadding="0" leftPadding="3" bottomPadding="0"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<text><![CDATA[OBS.: * A Abertura / trincamento do calafeto ocorre em virtude da movimentação natural da madeira, umidade relativa do ar, mudança de teperatura. Este fenomeno natural, está fora de controle de nossa mão de obra e do material utilizado.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="2" y="23" width="551" height="13" uuid="36402064-9bb4-4a44-ae1f-21cec2438e80"/>
+				<box topPadding="1" leftPadding="3" bottomPadding="1"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<text><![CDATA[* PINTURA - recomendamos deixar a ultima demão de tinta para depois do piso pronto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="2" y="67" width="551" height="13" uuid="cf550468-bda5-416d-aacd-9d9a98fd39b0"/>
+				<box topPadding="1" leftPadding="3" bottomPadding="1"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<text><![CDATA[* METRAGEM MÍNIMA: 30m2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="2" y="81" width="551" height="13" uuid="67a34372-d400-4813-91ba-7dffa08a0169"/>
+				<box topPadding="1" leftPadding="3" bottomPadding="1"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<text><![CDATA[* ETAPAS - para realizar o serviço em etapas é cobrado uma taxa por etapas.]]></text>
+			</staticText>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band height="120">
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="474" y="61" width="81" height="20" uuid="c3de5ab6-9aa7-4dd3-9ac5-9aab13a81d51"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{Parcelas}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="124" y="37" width="215" height="15" uuid="8efabb67-7039-46e6-85ba-bc26e007696c"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Condicao}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="374" y="81" width="100" height="20" uuid="7d08434b-017c-4ed5-b869-7a091d1edd4e"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Parcela(s)]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="474" y="21" width="81" height="20" uuid="153e29d0-44ab-4016-852f-83ca829a42d6"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{TotalDescontos}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="7" y="21" width="100" height="15" uuid="383298e9-6218-48dd-a731-a868b09b89b8"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<text><![CDATA[Forma de Pagamento:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="7" y="54" width="331" height="15" uuid="ca50af98-28e1-4288-be1e-083ea88c1cf3"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<text><![CDATA[Validade da Proposta: 15 Dias]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="374" y="61" width="100" height="20" uuid="b7870efe-36cc-41d2-aa97-4137961bc422"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Parcela(s)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="7" y="88" width="41" height="15" uuid="62430ad9-2ccd-4585-9a35-7f4cf49774b4"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<text><![CDATA[Vendas:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="7" y="4" width="90" height="15" uuid="87cfad42-6404-4779-9df8-c5b119747ca6"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<text><![CDATA[Prazo de Execução:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="374" y="41" width="100" height="20" uuid="e5d4e866-8522-4b0c-b5ef-aa92bf3d02a9"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Proposta]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="474" y="81" width="81" height="20" uuid="2b01d857-e27e-4e26-a997-da6665b2c498"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{Valor_Parcela}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="48" y="105" width="190" height="15" uuid="66a3d4e9-062c-4524-acf5-c49cfc56e452"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Tecnico}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="7" y="105" width="41" height="15" uuid="6fac747c-38f3-4ad7-9063-fd75ee61bfda"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<text><![CDATA[Técnico:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="7" y="38" width="116" height="15" uuid="d8c33f62-b15f-4b07-a040-6c2293205650"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<text><![CDATA[Condição de Pagamento:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="50" y="88" width="241" height="15" uuid="190101c2-7f50-4f07-9e25-3bea4ec9c6b6"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Vendas}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="474" y="41" width="81" height="20" uuid="155ed296-3640-4f63-b67d-79ba10a3acb8"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{ValorTotalLiquido}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="107" y="21" width="231" height="15" uuid="7e466c43-fee0-4b2e-bdb1-b25b15e8fdae"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Pagamento}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="374" y="22" width="100" height="20" uuid="a6ed1a2e-6b62-4d11-bcd2-ece19f337824"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Descontos]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="97" y="4" width="241" height="15" uuid="52d02d3d-a105-4d3a-82a9-af76e2146180"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PrazoExecucao}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="7" y="71" width="26" height="15" uuid="313e0e34-e93e-4492-9755-10ae809381d9"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<text><![CDATA[Data:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="412" y="1" width="62" height="20" uuid="f9135d3c-9277-421e-aceb-e43307753653"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor Total]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="474" y="1" width="81" height="20" uuid="0ea4b8ff-ee27-4b20-aa1a-143c77acf91f"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{ValorTotalBruto}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="33" y="71" width="100" height="15" uuid="ed501095-a35c-43af-bef8-22c338535dd6"/>
+				<textElement>
+					<font fontName="Calibri" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Envio}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>
