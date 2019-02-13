@@ -40,6 +40,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTable;
+import net.sf.jasperreports.engine.JRException;
 
 /**
  *
@@ -147,9 +148,22 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jForNumPreparacao.setDocument(new DefineCampoInteiro());
         jForDataLiquidacaoDe.setDocument(new DefineCampoData());
         jForDataLiquidacaoAte.setDocument(new DefineCampoData());
-        cpp = new CPreparacaoPagamentos(conexao, su);
+        carregaControles();
         buscarTotalPortadores();
         buscarAgendamentos();
+    }
+
+    /**
+     * Método para instanciar controladores
+     */
+    private void carregaControles() {
+        cpp = new CPreparacaoPagamentos(conexao, su);
+        try {
+            ctPortadores = new ConsultaTitulos(conexao);
+            ctTitulos = new ConsultaTitulos(conexao);
+        } catch (SQLException ex) {
+            Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -169,11 +183,10 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         }
 
         try {
-            ctPortadores = new ConsultaTitulos(conexao);
             ctPortadores.callProcedure(sqlPortadores, dtVctoIni, dtVctoFin, dtEmisIni, dtEmisFin, pagarReceberIni, pagarReceberFin, tipoLancametoIni, tipoLancametoFin, "AB", nome);
-            jTabPortadores.setModel(ctPortadores);
-            ctPortadores.ajustarTabela(jTabPortadores, 5, 5, 100, 5, 100, 30);
             if (ctPortadores.getRowCount() > 0) {
+                jTabPortadores.setModel(ctPortadores);
+                ctPortadores.ajustarTabela(jTabPortadores, 5, 5, 100, 5, 100, 30);
                 moverLinha = true;
                 ctPortadores.totalizaPortadores();
                 jForTotTitReceber.setText(String.valueOf(ctPortadores.getTotTitulosRec()));
@@ -197,7 +210,6 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         sqlTitulo = "call pr_titulosXportadorXtipoPagamento(?,?,?,?,?,?,?,?,?,?,?,?,?)";
         linhaTitulos = 0;
         try {
-            ctTitulos = new ConsultaTitulos(conexao);
             ctTitulos.callProcedure(sqlTitulo, dtVctoIni, dtVctoFin, dtEmisIni, dtEmisFin, pagarReceberIni, pagarReceberFin, tipoLancametoIni, tipoLancametoFin, "AB", nome, cdPorador, cdTipoPagamento, cdTipoMovimento);
             jTabTitulo.setModel(ctTitulos);
             intervaloTit = new boolean[jTabTitulo.getRowCount()];
@@ -581,6 +593,12 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                 jTabPagamentosAgendados.getValueAt(linhaPagamAgend, 0).toString());
     }
 
+    /**
+     * Método para gerar arquivo CNAB
+     *
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
     private void gerarArquivoCNAB() throws FileNotFoundException, IOException {
         cnab = new ArquivoCNAB();
         cpp.buscarParametrosEDI(cnab, jTexCdInfoTipoPagamento.getText());
@@ -588,6 +606,10 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         if (ccnab.prepararArquivo() == 1) {
             ccnab.gerarArquivo();
         }
+    }
+
+    private void imprimirBoleto() throws SQLException, JRException {
+        cpp.prepararBoleto(jTabPagamentosAgendados.getValueAt(linhaPagamAgend, 0).toString(), "BoletoItau.jasper");
     }
 
     /**
@@ -1748,6 +1770,11 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jButBoleto.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jButBoleto.setText("Boleto");
         jButBoleto.setEnabled(false);
+        jButBoleto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButBoletoActionPerformed(evt);
+            }
+        });
 
         jButArquivoCnab.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jButArquivoCnab.setText("CNAB");
@@ -2071,6 +2098,16 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButArquivoCnabActionPerformed
+
+    private void jButBoletoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButBoletoActionPerformed
+        try {
+            imprimirBoleto();
+        } catch (SQLException ex) {
+            Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JRException ex) {
+            Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButBoletoActionPerformed
 
     /**
      * @param args the command line arguments

@@ -5,6 +5,7 @@
  */
 package br.com.gfc.controle;
 
+import br.com.DAO.ConsultaModelo;
 import br.com.controle.CEmpresa;
 import br.com.controle.CRelatorio;
 import br.com.gfc.dao.LancamentosDAO;
@@ -327,6 +328,15 @@ public class CPreparacaoPagamentos {
 
     /**
      * Método para gerar o relatório da preparacao
+     *
+     * @param cdPortador
+     * @param cdTipoPgto
+     * @param liquidacaoIni
+     * @param liquidacaoFin
+     * @param cdTipoLancamento
+     * @param qtdTitulos
+     * @param valorTotal
+     * @param cdPreparacao
      */
     public void prepararRelatorio(String cdPortador, String cdTipoPgto, String liquidacaoIni, String liquidacaoFin, String cdTipoLancamento,
             String qtdTitulos, String valorTotal, String cdPreparacao) {
@@ -354,6 +364,52 @@ public class CPreparacaoPagamentos {
         } catch (JRException ex) {
             Logger.getLogger(CPreparacaoPagamentos.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void prepararBoleto(String cdPreparacao, String boleto) throws SQLException, JRException {
+        String sql = "select * from vw_gfc_emitirboleto where preparacao = '" + cdPreparacao
+                + "'";
+        ConsultaModelo bol = new ConsultaModelo(conexao);
+        bol.setQuery(sql);
+        if (bol.getRowCount() > 0) {
+            InputStream is = getClass().getResourceAsStream(boleto);
+            String boletoBanco = su.getLocalRelatorio() + boleto.toString();
+            mensagem("Caminho Boleto: " + su.getLocalRelatorio() + boleto.toString());
+            Map par = new HashMap();
+            CRelatorio rel = new CRelatorio();
+            for (int i = 0; i < bol.getRowCount(); i++) {
+                par.put("pLocalPgto", "PAGÁVEL EM QUALQUER BANCO ATÉ O VENCIMENTO");
+                par.put("pVencimento", bol.getValueAt(i, 2));
+                par.put("pBeneficiario", bol.getValueAt(i, 3));
+                par.put("pAgenciaCodigoBeneficiario", bol.getValueAt(i, 3));
+                par.put("pAgenciaCodigoBeneficiario", bol.getValueAt(i, 4));
+                par.put("pEndBeneficiario", bol.getValueAt(i, 5));
+                par.put("pDataDocumento", bol.getValueAt(i, 6));
+                par.put("pNumDocumento", bol.getValueAt(i, 7));
+                par.put("pEspecieDoc", bol.getValueAt(i, 8));
+                par.put("pAceite", bol.getValueAt(i, 9));
+                par.put("pDataProcessamento", bol.getValueAt(i, 10));
+                par.put("NossoNumero", "");
+                par.put("Carteira", bol.getValueAt(i, 11));
+                par.put("pEspecie",bol.getValueAt(i, 12));
+                par.put("pQuantidade", "");
+                par.put("Valor", "");
+                par.put("pValorDocumento", bol.getValueAt(i, 13));
+                par.put("pDescricao1", bol.getValueAt(i, 15));
+                par.put("pDescricao2", bol.getValueAt(i, 16));
+                par.put("pDescricao3", bol.getValueAt(i, 17));
+                par.put("pDescontoAbatimento", "");
+                par.put("pMouraMulta", bol.getValueAt(i, 14));
+                par.put("pValorCobrado", "");
+                par.put("pPagador", bol.getValueAt(i, 18));
+                par.put("pEndPagador", bol.getValueAt(i, 19));
+                par.put("pSacadorAvalista", "");
+                par.put("pLinhaDigitavel", "");
+                par.put("pCodigoBarras", "34191577266373357126782843440007177060000100000");
+                rel.abrirRelatorio("EmitirBoleto", boletoBanco, par, conexao);
+            }
+        }
+
     }
 
     /**
@@ -482,10 +538,11 @@ public class CPreparacaoPagamentos {
                     + "'";
             if (cem.pesquisar(sql) > 0) {
                 cem.mostrarPesquisa(em, 0);
-                if("F".equals(em.getTipoPessoa()))
+                if ("F".equals(em.getTipoPessoa())) {
                     cnab.setTipoPessoaEmpresa("01");
-                else
+                } else {
                     cnab.setTipoPessoaEmpresa("02");
+                }
                 cnab.setCpfCnpjEmpresa(cpfCnpj);
                 return em.getNomeRazaoSocial();
             } else {
@@ -525,7 +582,7 @@ public class CPreparacaoPagamentos {
                 cnab.setCdBanco(cdBanco);
                 cnab.setNomeBanco(nomeBanco.trim().toUpperCase());
                 cnab.setCdCarteira(pedi.getCdCarteira().trim().toString().substring(0, 3));
-                mensagem("Código Carteira Pesquisada: " + pedi.getCdCarteira() + "\nCódigo Carteira Gravada: "+cnab.getCdCarteira());
+                mensagem("Código Carteira Pesquisada: " + pedi.getCdCarteira() + "\nCódigo Carteira Gravada: " + cnab.getCdCarteira());
                 return 1;
             } else {
                 return 0;
@@ -558,8 +615,9 @@ public class CPreparacaoPagamentos {
     private void setEnviarArquivoCNAB(String enviarArquivo) {
         if ("S".equals(enviarArquivo)) {
             this.enviarArquivoCNAB = true;
-        }else
+        } else {
             this.enviarArquivoCNAB = false;
+        }
     }
 
     /**
