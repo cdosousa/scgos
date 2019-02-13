@@ -373,8 +373,7 @@ public class CPreparacaoPagamentos {
         bol.setQuery(sql);
         if (bol.getRowCount() > 0) {
             InputStream is = getClass().getResourceAsStream(boleto);
-            String boletoBanco = su.getLocalRelatorio() + boleto.toString();
-            mensagem("Caminho Boleto: " + su.getLocalRelatorio() + boleto.toString());
+            String boletoBanco = su.getLocalBoletoBanco() + boleto.toString();
             Map par = new HashMap();
             CRelatorio rel = new CRelatorio();
             for (int i = 0; i < bol.getRowCount(); i++) {
