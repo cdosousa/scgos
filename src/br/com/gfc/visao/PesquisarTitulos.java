@@ -436,7 +436,7 @@ public class PesquisarTitulos extends javax.swing.JDialog {
         jPanePesquisar.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabel1.setText("Pesquisar Produto:");
+        jLabel1.setText("Pesquisar Títulos por cliente:");
 
         jTexPesquisar.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -940,18 +940,20 @@ public class PesquisarTitulos extends javax.swing.JDialog {
 
     private void jTexPesquisarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTexPesquisarKeyReleased
         if (!jTexPesquisar.getText().isEmpty()) {
-            sql = "SELECT CD_MATERIAL AS Código,"
-                    + "NOME_MATERIAL AS Descrição,"
-                    + "CD_GRUPO AS Grupo,"
-                    + "CD_SUBGRUPO AS SubGrupo,"
-                    + "CD_CATEGORIA AS Categoria,"
-                    + "CD_MARCA AS Marca,"
-                    + "CD_CLASSE AS Classe,"
-                    + "CD_ESSENCIA AS Essencia,"
-                    + "CD_UNIDMEDIDA AS UM,"
-                    + "SITUACAO AS Situacao"
-                    + " FROM GCSMATERIAL"
-                    + " WHERE NOME_MATERIAL LIKE '%"
+            sql = "select l.cd_lancamento as Lancamento,"
+                    + "l.data_cadastro as Data,"
+                    + "l.cpf_cnpj as Cliente,"
+                    + "c.nome_razaosocial as Nome,"
+                    + "l.titulo as Titulo,"
+                    + "l.cd_parcela as Parcela,"
+                    + "l.data_emissao as Emissao,"
+                    + "l.data_vencimento as Vencimento,"
+                    + "l.data_liquidacao as Liquidacao,"
+                    + "l.valor_lancamento as Valor,"
+                    + "l.valor_saldo as Saldo,"
+                    + "l.situacao as Situacao"
+                    + " from gfclancamentos as l"
+                    + " inner join pgsempresa as c on l.cpf_cnpj = c.cpf_cnpj and c.nome_razaosocial LIKE '%"
                     + jTexPesquisar.getText().trim()
                     + "%'";
             //indexAtual = 0;
