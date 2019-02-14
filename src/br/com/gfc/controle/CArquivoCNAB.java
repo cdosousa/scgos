@@ -125,7 +125,7 @@ public class CArquivoCNAB {
         String[] head = formatarString(cnab, "0");
         String cabecalho = "";
         arquivo[idxArq - 1] = posicionarCampos(head, tipo, tamanho);
-        mensagem("Arquivo: " + arquivo[idxArq]);
+        //mensagem("Arquivo: " + arquivo[idxArq]);
         idxArq++;
         return 1;
     }
@@ -145,7 +145,7 @@ public class CArquivoCNAB {
                     + "'";
             ConsultaModelo cm = new ConsultaModelo(conexao);
             cm.setQuery(sql);
-            mensagem("Preparacao: " + cdPreparacao + "\nTítulos Encontrados: " + cm.getRowCount());
+            //mensagem("Preparacao: " + cdPreparacao + "\nTítulos Encontrados: " + cm.getRowCount());
             if (cm.getRowCount() > 0) {
                 DataSistema dat = new DataSistema();
                 dat.setData("");
@@ -317,7 +317,7 @@ public class CArquivoCNAB {
         int y = 0;
         String linha = "";
         do {
-            mensagem("Conteudo: " + campos[x] + "\nTamanho: " + tamanho[y]);
+            //mensagem("Conteudo: " + campos[x] + "\nTamanho: " + tamanho[y]);
             if ("X".equals(tipo[x].toString().toUpperCase())) {
                 if (campos[x].length() < tamanho[y]) {
                     if (campos[x].isEmpty()) {
@@ -325,7 +325,7 @@ public class CArquivoCNAB {
                     } else {
                         int qtd = Integer.valueOf(tamanho[y]) - campos[x].trim().length();
                         int tam = campos[x].length();
-                        mensagem("Tamanho do conteudo: " + tam + "\nQtde Brancos a buscar: " + qtd);
+                        //mensagem("Tamanho do conteudo: " + tam + "\nQtde Brancos a buscar: " + qtd);
                         linha = String.format("%s%s%s", linha, campos[x].toString().substring(0, tam), gerarBrancos(qtd));
                     }
                 } else {
