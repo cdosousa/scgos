@@ -400,7 +400,7 @@ public class CPreparacaoPagamentos {
                 par.put("pEspecieDoc", bol.getValueAt(i, 8));
                 par.put("pAceite", bol.getValueAt(i, 9));
                 par.put("pDataProcessamento", bol.getValueAt(i, 10));
-                par.put("Carteira", bol.getValueAt(i, 11));
+                par.put("pCarteira", bol.getValueAt(i, 11));
                 par.put("pEspecie", bol.getValueAt(i, 12));
                 par.put("pQuantidade", "");
                 par.put("Valor", "");
@@ -423,7 +423,7 @@ public class CPreparacaoPagamentos {
                 //              + codigoBarras.length() + "\nPosicao 1: " + codigoBarras.substring(1, 2) + "\nPosicao 41: " + codigoBarras.substring(41, 42)
                 //              + "\nPosicao 0: " + codigoBarras.substring(0, 1));
                 linhaDigitavel.setText(linhaDig);
-                par.put("pNossoNumero", String.format("%s%s%s", bol.getValueAt(i, 11), "/", bol.getValueAt(i, 20).toString()));
+                par.put("pNossoNumero", String.format("%s%s%s", bol.getValueAt(i, 11), "/", cb.getNossoNumero()));
                 par.put("pCodigoBarras", codigoBarras);
                 par.put("pLinhaDigitavel", linhaDigitavel.getText());
                 par.put("pIconeBanco", pg.getLocalImagens() + "icone_itau.jpg");
