@@ -342,14 +342,14 @@ public class CPreparacaoPagamentos {
     /**
      * Método para gerar o relatório da preparacao
      *
-     * @param cdPortador
-     * @param cdTipoPgto
-     * @param liquidacaoIni
-     * @param liquidacaoFin
-     * @param cdTipoLancamento
-     * @param qtdTitulos
-     * @param valorTotal
-     * @param cdPreparacao
+     * @param cdPortador Cógido do portador do lancamento
+     * @param cdTipoPgto Código do tipo de pagamento do lancamento
+     * @param liquidacaoIni menor data de vencimento dos títulos envolvidos
+     * @param liquidacaoFin maior data de vencimento dos títulos envolvidos
+     * @param cdTipoLancamento código do tipo de lancamento
+     * @param qtdTitulos quantidade de títulos relacionados a preparação
+     * @param valorTotal valor total da preparação de pagamento
+     * @param cdPreparacao código da preparação de pagamento
      */
     public void prepararRelatorio(String cdPortador, String cdTipoPgto, String liquidacaoIni, String liquidacaoFin, String cdTipoLancamento,
             String qtdTitulos, String valorTotal, String cdPreparacao) {
@@ -379,6 +379,14 @@ public class CPreparacaoPagamentos {
         }
     }
 
+    /**
+     * Método responsável por preparar os dados necessários para a impressão do boleto
+     * @param cdPreparacao numero da preparação de pagamento do lancamento financeiro
+     * @param boleto nome do layout do boleto que será impresso
+     * @throws SQLException retorna uma excessão de erro do SQL
+     * @throws JRException retorna uma excessão de erro geral
+     * @throws ParseException Retorna uma excessão de erro formatação de máscara
+     */
     public void prepararBoleto(String cdPreparacao, String boleto) throws SQLException, JRException, ParseException {
         String sql = "select * from vw_gfc_emitirboleto where preparacao = '" + cdPreparacao
                 + "'";
@@ -467,6 +475,12 @@ public class CPreparacaoPagamentos {
         return ccb.dacCodigoBarras2of5();
     }
 
+    /**
+     * Método para preparar a linha digigável do boleto
+     * @param linha índice da linha do resultSet que contem o registro com os dados necessários para alinha digitável
+     * @param bol Objeto contendo o resultSet com o registro dos dados que comporão a linha digitável
+     * @return uma string contendo o valor da linha digitável
+     */
     private String prepararLinhaDigitavel(int linha, ConsultaModelo bol) {
         String campo1 = String.format("%s%s%s%s", cdBanco, "9", bol.getValueAt(linha, 11).toString(), codigoBarras.substring(22, 24));
         String campo2 = String.format("%s%s%s", codigoBarras.substring(24, 30), cb.getDacAgenciaContaNossoNumero(), cdAgencia.substring(0, 3));
