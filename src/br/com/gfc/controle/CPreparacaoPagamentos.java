@@ -8,6 +8,7 @@ package br.com.gfc.controle;
 import br.com.DAO.ConsultaModelo;
 import br.com.controle.CCodigoBarras;
 import br.com.controle.CEmpresa;
+import br.com.controle.CPosicionarArquivo;
 import br.com.controle.CRelatorio;
 import br.com.gfc.dao.LancamentosDAO;
 import br.com.gfc.modelo.Portadores;
@@ -23,6 +24,7 @@ import br.com.modelo.CodigoBarras;
 import br.com.modelo.DataSistema;
 import br.com.modelo.Empresa;
 import br.com.modelo.HoraSistema;
+import br.com.modelo.ParametrosGerais;
 import br.com.modelo.SessaoUsuario;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -35,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import net.sf.jasperreports.engine.JRException;
@@ -61,7 +64,8 @@ public class CPreparacaoPagamentos {
     private String cdPortador;
     private NumberFormat formato;
     private String codigoBarras;
-    private String linhaDigitavel;
+    private String dac2Of5;
+    private JFormattedTextField linhaDigitavel = new JFormattedTextField();
 
     // variáveis correlatos;
     private String cdPor;
@@ -89,6 +93,7 @@ public class CPreparacaoPagamentos {
     private DataSistema dat;
     private String data = null;
     private SessaoUsuario su;
+    private ParametrosGerais pg;
     private final String tableSource = "gfcpreparacaopagamentos";
 
     /**
@@ -97,9 +102,10 @@ public class CPreparacaoPagamentos {
      * @param conexao Objeto contendo os parâmetros de conexão do usuário
      * @param su Objeto contendo a sessão ativa do usuário
      */
-    public CPreparacaoPagamentos(Connection conexao, SessaoUsuario su) {
+    public CPreparacaoPagamentos(Connection conexao, SessaoUsuario su, ParametrosGerais pg) {
         this.conexao = conexao;
         this.su = su;
+        this.pg = pg;
     }
 
     /**
@@ -373,7 +379,7 @@ public class CPreparacaoPagamentos {
         }
     }
 
-    public void prepararBoleto(String cdPreparacao, String boleto) throws SQLException, JRException {
+    public void prepararBoleto(String cdPreparacao, String boleto) throws SQLException, JRException, ParseException {
         String sql = "select * from vw_gfc_emitirboleto where preparacao = '" + cdPreparacao
                 + "'";
         ConsultaModelo bol = new ConsultaModelo(conexao);
@@ -394,14 +400,13 @@ public class CPreparacaoPagamentos {
                 par.put("pEspecieDoc", bol.getValueAt(i, 8));
                 par.put("pAceite", bol.getValueAt(i, 9));
                 par.put("pDataProcessamento", bol.getValueAt(i, 10));
-                par.put("pNossoNumero", String.format("%s%s%s",bol.getValueAt(i, 11),"/", bol.getValueAt(i, 20).toString()));
                 par.put("Carteira", bol.getValueAt(i, 11));
                 par.put("pEspecie", bol.getValueAt(i, 12));
                 par.put("pQuantidade", "");
                 par.put("Valor", "");
                 par.put("pValorDocumento", bol.getValueAt(i, 13));
-                par.put("pDescricao1", bol.getValueAt(i, 15)+" "+bol.getValueAt(i, 14)+ "AO DIA");
-                par.put("pDescricao2", bol.getValueAt(i, 16)+" "+"20,00");
+                par.put("pDescricao1", bol.getValueAt(i, 15) + "    " + bol.getValueAt(i, 14) + "   AO DIA");
+                par.put("pDescricao2", bol.getValueAt(i, 16) + " " + "   20,00");
                 par.put("pDescricao3", bol.getValueAt(i, 17));
                 par.put("pDescontoAbatimento", "");
                 par.put("pMouraMulta", bol.getValueAt(i, 14));
@@ -409,10 +414,20 @@ public class CPreparacaoPagamentos {
                 par.put("pPagador", bol.getValueAt(i, 18));
                 par.put("pEndPagador", bol.getValueAt(i, 19));
                 par.put("pSacadorAvalista", "");
+                //      mensagem("Vou preparar o código de barras!");
                 codigoBarras = prepararCodigoBarras(i, bol);
-                linhaDigitavel = prepararLinhaDigitavel(i, bol);
+                //      mensagem("Vou preparar a linhaDigitavel!");
+                linhaDigitavel.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("#####.##### #####.###### #####.###### # ##############")));
+                String linhaDig = prepararLinhaDigitavel(i, bol);
+                //      mensagem("Codigo de Barras: " + codigoBarras + "\nLinhaDigitável: " + linhaDig + "\nDAC 2Of5: " + dac2Of5 + "\nTamanho String: "
+                //              + codigoBarras.length() + "\nPosicao 1: " + codigoBarras.substring(1, 2) + "\nPosicao 41: " + codigoBarras.substring(41, 42)
+                //              + "\nPosicao 0: " + codigoBarras.substring(0, 1));
+                linhaDigitavel.setText(linhaDig);
+                par.put("pNossoNumero", String.format("%s%s%s", bol.getValueAt(i, 11), "/", bol.getValueAt(i, 20).toString()));
                 par.put("pCodigoBarras", codigoBarras);
-                par.put("pLinhaDigitavel", linhaDigitavel);
+                par.put("pLinhaDigitavel", linhaDigitavel.getText());
+                par.put("pIconeBanco", pg.getLocalImagens() + "icone_itau.jpg");
+                par.put("pCobrarJuros", "N");
                 rel.abrirRelatorio("EmitirBoleto", boletoBanco, par, conexao);
             }
         }
@@ -427,6 +442,7 @@ public class CPreparacaoPagamentos {
      * @return String contendo o código de barras criado
      */
     private String prepararCodigoBarras(int linha, ConsultaModelo bol) {
+        CPosicionarArquivo cpa = new CPosicionarArquivo();
         DataSistema dat = new DataSistema();
         cb = new CodigoBarras();
         ccb = new CCodigoBarras(cb);
@@ -436,26 +452,30 @@ public class CPreparacaoPagamentos {
         cb.setFatorVerncimento(String.valueOf(ccb.fatorVencimento(dat.getDataConv(bol.getValueAt(linha, 2).toString())))); //buscar fator de vencimento - OK
         cb.setValorTitulo(String.valueOf(bol.getValueAt(linha, 13)).replace(".", "").replace(",", ""));
         cb.setCdCarteira(bol.getValueAt(linha, 11).toString());
-        cb.setNossoNumero(bol.getValueAt(linha, 20).toString());
-        cb.setDacAgenciaContaNossoNumero(String.valueOf(ccb.dacModulo10(String.format("%s%s%s%s%s", cdAgencia, cdConta, cdContaDig, bol.getValueAt(linha, 11).toString(), bol.getValueAt(linha, 20).toString())))); //buscar dac destes campo - OK
+        cb.setNossoNumero(String.format("%s%s", cpa.gerarZeroEsquerda(8 - bol.getValueAt(linha, 20).toString().length()), bol.getValueAt(linha, 20).toString()));
+        //mensagem("Buscando DAC modulo 10 da AgenciaContaNossoNumero!");
+        cb.setDacAgenciaContaNossoNumero(String.valueOf(ccb.dacModulo10(String.format("%s%s%s%s", cdAgencia, cdConta, bol.getValueAt(linha, 11).toString(), cb.getNossoNumero())))); //buscar dac destes campo - OK
         cb.setCdAgenciaBenef(cdAgencia);   //buscar agencia deste beneciciario - OK
         cb.setContaCorrBenef(cdConta);  //buscar conta deste beneficiaro - OK
-        dacAgenciaContaNossoNumero = String.valueOf(ccb.dacModulo10(String.format("%s%s", cdAgencia, cdConta)));
+        //mensagem("Buscando DAC modulo 10 da AgenciaContaCorrente!");
+        //dacAgenciaContaNossoNumero = ;
         //mensagem("DacAgenciaContaNossoNumero Gerado: \n"+dacAgenciaContaNossoNumero);
-        cb.setDacAgenciConta(dacAgenciaContaNossoNumero); //buscar dac da agencia conta - OK
+        cb.setDacAgenciConta(String.valueOf(ccb.dacModulo10(String.format("%s%s", cdAgencia, cdConta)))); //buscar dac da agencia conta - OK
         cb.setZeros("000");
         //mensagem("Código Gerado: \n" + ccb.dacCodigoBarras2of5());
+        dac2Of5 = ccb.dacCodigoBarras2of5().substring(5, 6);
         return ccb.dacCodigoBarras2of5();
     }
 
     private String prepararLinhaDigitavel(int linha, ConsultaModelo bol) {
-        String campo1 = String.format("%s%s%s%s", cdBanco, "9", bol.getValueAt(linha, 11).toString(), codigoBarras.substring(23, 25));
-        String campo2 = String.format("%s%s%s", codigoBarras.substring(25, 30), dacAgenciaContaNossoNumero.substring(0, 1), cdAgencia.substring(0, 3));
+        String campo1 = String.format("%s%s%s%s", cdBanco, "9", bol.getValueAt(linha, 11).toString(), codigoBarras.substring(22, 24));
+        String campo2 = String.format("%s%s%s", codigoBarras.substring(24, 30), cb.getDacAgenciaContaNossoNumero(), cdAgencia.substring(0, 3));
         String campo3 = String.format("%s%s%s%s", cdAgencia.substring(3, 4), cdConta, cdContaDig, "000");
-        String campo4 = codigoBarras.substring(6, 7);
-        String campo5 = String.format("%s%s", codigoBarras.substring(7, 11), codigoBarras.substring(10, 19));
+        String campo4 = codigoBarras.substring(4, 5);
+        String campo5 = String.format("%s%s", codigoBarras.substring(5, 9), codigoBarras.substring(9, 19));
         //mensagem("Campo1: " + campo1 + "\nCampo2: " + campo2 + "\nCampo3: " + campo3 + "\nCampo4: " + campo4 + "\nCampo5: " + campo5);
-        return linhaDigitavel = ccb.dacLinhaDigitavel(campo1, campo2, campo3, campo4, campo5);
+        //mensagem("Vou gerar o dac da linha digitável!");
+        return ccb.dacLinhaDigitavel(campo1, campo2, campo3, campo4, campo5);
     }
 
     /**

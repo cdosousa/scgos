@@ -157,7 +157,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
      * Método para instanciar controladores
      */
     private void carregaControles() {
-        cpp = new CPreparacaoPagamentos(conexao, su);
+        cpp = new CPreparacaoPagamentos(conexao, su,pg);
         try {
             ctPortadores = new ConsultaTitulos(conexao);
             ctTitulos = new ConsultaTitulos(conexao);
@@ -608,7 +608,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         }
     }
 
-    private void imprimirBoleto() throws SQLException, JRException {
+    private void imprimirBoleto() throws SQLException, JRException, ParseException {
         cpp.prepararBoleto(jTabPagamentosAgendados.getValueAt(linhaPagamAgend, 0).toString(), "BoletoItau.jasper");
     }
 
@@ -2101,7 +2101,11 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
 
     private void jButBoletoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButBoletoActionPerformed
         try {
-            imprimirBoleto();
+            try {
+                imprimirBoleto();
+            } catch (ParseException ex) {
+                Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } catch (SQLException ex) {
             Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
         } catch (JRException ex) {
