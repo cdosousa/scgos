@@ -212,9 +212,9 @@ public class CArquivoCNAB {
      */
     public int gerarArquivo() throws FileNotFoundException, IOException {
         int cont = 1;
-        saida.write(arquivo[0] + "\n");
+        saida.write(arquivo[0] + System.lineSeparator());
         do {
-            saida.write(arquivo[cont] + "\n");
+            saida.write(arquivo[cont] + System.lineSeparator());
             cont++;
         } while (cont < idxArq);
         saida.close();
