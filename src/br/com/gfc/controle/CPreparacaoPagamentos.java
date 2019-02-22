@@ -414,7 +414,7 @@ public class CPreparacaoPagamentos {
                 par.put("Valor", "");
                 par.put("pValorDocumento", bol.getValueAt(i, 13));
                 par.put("pDescricao1", bol.getValueAt(i, 15) + "    " + bol.getValueAt(i, 14) + "   AO DIA");
-                par.put("pDescricao2", bol.getValueAt(i, 16) + " " + "   20,00");
+                par.put("pDescricao2", bol.getValueAt(i, 16) + "    " + bol.getValueAt(i, 21));
                 par.put("pDescricao3", bol.getValueAt(i, 17));
                 par.put("pDescontoAbatimento", "");
                 par.put("pMouraMulta", bol.getValueAt(i, 14));
@@ -661,7 +661,10 @@ public class CPreparacaoPagamentos {
                 cnab.setCdContaDig(cdContaDig);
                 cnab.setCdBanco(cdBanco);
                 cnab.setNomeBanco(nomeBanco.trim().toUpperCase());
+                cnab.setTaxaJuros(txJuros);
+                cnab.setTaxaMulta(txMulta);
                 cnab.setCdCarteira(pedi.getCdCarteira().trim().toString().substring(0, 3));
+                cnab.setCdMulta(pedi.getCdJurosMora());
                 mensagem("Código Carteira Pesquisada: " + pedi.getCdCarteira() + "\nCódigo Carteira Gravada: " + cnab.getCdCarteira());
                 return 1;
             } else {

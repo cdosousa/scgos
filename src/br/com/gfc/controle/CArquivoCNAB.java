@@ -48,11 +48,15 @@ public class CArquivoCNAB {
 
     /**
      * Contrutor para ser utilizado para gerar arquivo no disto
+     *
      * @param cnab Objeto contendo as informações padrão do arquivo
      * @param pg Objeto contedo os parametros gerais do sistema
-     * @param conexao Objetoc contendo a instância de conexão do usuário com o banco de dados
-     * @param linhas Variáveis inteira contendo a quantidade de registro que serão gravados
-     * @param cdPreparacao variáveis contendo o códido da preparação de pagamento
+     * @param conexao Objetoc contendo a instância de conexão do usuário com o
+     * banco de dados
+     * @param linhas Variáveis inteira contendo a quantidade de registro que
+     * serão gravados
+     * @param cdPreparacao variáveis contendo o códido da preparação de
+     * pagamento
      * @throws FileNotFoundException Lançamento de erro de exeção
      * @throws IOException Lançamento de erro de exeção
      */
@@ -67,24 +71,27 @@ public class CArquivoCNAB {
 
     /**
      * Método para setar as variáveis de ambiente para escrever no arquivo
+     *
      * @throws FileNotFoundException
-     * @throws IOException 
+     * @throws IOException
      */
     private void setaVariaveisEscrita() throws FileNotFoundException, IOException {
-        saida = new FileWriter(pg.getLocalBoletoBanco() + "remessaItau.txt");
+        saida = new FileWriter(pg.getLocalBoletoBanco() + "remessa.txt");
     }
-    
+
     /**
      * Método para setar as variáveis de leitura do arquivo
-     * @throws FileNotFoundException 
+     *
+     * @throws FileNotFoundException
      */
-    private void setaVariaveisLeitura() throws FileNotFoundException{
+    private void setaVariaveisLeitura() throws FileNotFoundException {
         entrada = new FileReader(pg.getLocalBoletoBanco() + "retornoItau.txt");
-       
+
     }
 
     /**
      * Método para preparar o arquivo que será gerado
+     *
      * @return retorna se o arquivo foi gerado.
      */
     public int prepararArquivo() {
@@ -136,7 +143,8 @@ public class CArquivoCNAB {
 
     /**
      * Método para criar o detalhe do arquivo
-     * @return 
+     *
+     * @return
      */
     public int criarDetalheItau() {
         String[] tipo = {"9", "9", "9", "9", "9", "9", "9", "X", "9", "X", "9", "9V", "9", "X", "X", "9", "X", "9", "9V", "9", "9", "X", "X", "9", "X", "X", "9V", "9", "9V", "9V", "9V", "9", "9", "X", "X", "X", "X",
@@ -157,14 +165,15 @@ public class CArquivoCNAB {
                     detail[9] = cm.getValueAt(i, 3).toString(); //identicicação do título
                     detail[10] = cm.getValueAt(i, 2).toString(); // nosso número
                     detail[16] = cm.getValueAt(i, 4).toString(); // Numero documento de Cobrança (Dupl, NP, Etc.)
-                    String vcto = dat.getDataConv(Date.valueOf(cm.getValueAt(i, 5).toString())).replaceAll("/", ""); 
-                    detail[17] = String.format("%s%s", vcto.substring(0, 4),vcto.substring(6)); // Vencimento
+                    String vcto = dat.getDataConv(Date.valueOf(cm.getValueAt(i, 5).toString())).replaceAll("/", "");
+                    detail[17] = String.format("%s%s", vcto.substring(0, 4), vcto.substring(6)); // Vencimento
+                    cnab.setDataVencimento(vcto);
                     String valor = cm.getValueAt(i, 6).toString().replace(",", "");
                     detail[18] = valor.replace(".", ""); // Valor nominal do Título
-                    String emis = dat.getDataConv(Date.valueOf(cm.getValueAt(i, 7).toString())).replaceAll("/", ""); 
-                    detail[23] = String.format("%s%s", emis.substring(0, 4),emis.substring(6)); // Data da emissao do título
+                    String emis = dat.getDataConv(Date.valueOf(cm.getValueAt(i, 7).toString())).replaceAll("/", "");
+                    detail[23] = String.format("%s%s", emis.substring(0, 4), emis.substring(6)); // Data da emissao do título
                     String jurosdia = cm.getValueAt(i, 8).toString().replace(",", "");
-                    detail[26] =  jurosdia.replace(".", "");// juros de 1 dia
+                    detail[26] = jurosdia.replace(".", "");// juros de 1 dia
                     detail[31] = cm.getValueAt(i, 9).toString(); // identificação do tipo de inscrição do pagador (01-CPF / 02-CNPJ)
                     detail[32] = cm.getValueAt(i, 10).toString(); // Número de inscrição do pagador (CPF / CNPJ)
                     detail[33] = cm.getValueAt(i, 11).toString(); // Nome do Pagador
@@ -173,9 +182,21 @@ public class CArquivoCNAB {
                     detail[37] = cm.getValueAt(i, 14).toString(); // CEP do Pagador
                     detail[38] = cm.getValueAt(i, 15).toString(); // Cidade do Pagador
                     detail[39] = cm.getValueAt(i, 16).toString(); // UF do Pagador
+                    detail[42] = detail[17];
+                    detail[43] = "66";
                     detail[45] = String.valueOf(idxArq);
                     arquivo[idxArq - 1] = cpc.posicionarCampos(detail, tipo, tamanho);
                     idxArq++;
+                    double valorMulta = (cnab.getTaxaMulta() * Double.valueOf(String.valueOf(cm.getValueAt(i, 6)).replace(".", "").replace(",", "."))) / 100;
+                    if (cnab.getTaxaMulta() > 0) {
+                        cnab.setValorMulta(String.valueOf(valorMulta).replace(".", ""));
+                        cnab.setCdTipoRegistro("2");
+                        if (criarDetalheMultaItau() != 1) {
+                            return 0;
+                        } else {
+
+                        }
+                    }
                 }
                 return 1;
             }
@@ -184,6 +205,23 @@ public class CArquivoCNAB {
             return 0;
         }
         return 0;
+    }
+
+    /**
+     * Método para criar o detalhe de multa do arquivo
+     *
+     * @return
+     */
+    public int criarDetalheMultaItau() {
+        String[] tipo = {"9", "X", "9", "9", "X", "9"};
+        int[] tamanho = {1, 1, 8, 13, 370, 6};
+        String[] detail = new String[tamanho.length];
+        detail = formatarString(cnab, cnab.getCdTipoRegistro());
+        detail[3] = cnab.getValorMulta().substring(0, 4);
+        detail[5] = String.valueOf(idxArq);
+        arquivo[idxArq - 1] = cpc.posicionarCampos(detail, tipo, tamanho);
+        idxArq++;
+        return 1;
     }
 
     /**
@@ -220,8 +258,8 @@ public class CArquivoCNAB {
         saida.close();
         return 1;
     }
-    
-    public int lerArquivo(){
+
+    public int lerArquivo() {
         int cont = 1;
         return 1;
     }
@@ -241,6 +279,10 @@ public class CArquivoCNAB {
         } else if ("1".equals(registro)) {
             String[] detail = new String[46];
             formatarDetalheItau(detail);
+            campos = detail;
+        } else {
+            String[] detail = new String[6];
+            formatarDetalheMultaItau(detail);
             campos = detail;
         }
         return campos;
@@ -304,13 +346,25 @@ public class CArquivoCNAB {
         detail[34] = cpc.gerarBrancos(10);
         detail[40] = cpc.gerarBrancos(30);
         detail[41] = cpc.gerarBrancos(4);
-        detail[42] = cpc.gerarZeroEsquerda(6);
         detail[43] = cpc.gerarZeroEsquerda(2);
         detail[44] = cpc.gerarBrancos(1);
     }
-    
+
+    /**
+     * -+ Método para formatar o detalhe para o banco itau
+     *
+     * @param detail
+     */
+    private void formatarDetalheMultaItau(String[] detail) {
+        detail[0] = cnab.getCdTipoRegistro();
+        detail[1] = cnab.getCdMulta();
+        detail[2] = cnab.getDataVencimento();
+        detail[4] = " ";
+    }
+
     /**
      * Método para gerar mensagem na tela
+     *
      * @param msg String contendo a mensagem
      */
     private void mensagem(String msg) {

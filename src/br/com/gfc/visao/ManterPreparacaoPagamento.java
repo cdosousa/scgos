@@ -602,7 +602,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private void gerarArquivoCNAB() throws FileNotFoundException, IOException {
         cnab = new ArquivoCNAB();
         cpp.buscarParametrosEDI(cnab, jTexCdInfoTipoPagamento.getText());
-        ccnab = new CArquivoCNAB(cnab, pg, conexao, jTabTitulosAgendados.getRowCount() + 2, jTabPagamentosAgendados.getValueAt(linhaTitAgend, 0).toString());
+        ccnab = new CArquivoCNAB(cnab, pg, conexao, jTabTitulosAgendados.getRowCount() * 2 + 2, jTabPagamentosAgendados.getValueAt(linhaTitAgend, 0).toString());
         if (ccnab.prepararArquivo() == 1) {
             ccnab.gerarArquivo();
         }
