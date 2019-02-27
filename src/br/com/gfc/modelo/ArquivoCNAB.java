@@ -9,8 +9,8 @@ package br.com.gfc.modelo;
  *
  * @author Cristiano de Oliveira Sousa
  */
-public class ArquivoCNAB extends ParametrosEDI{
-    
+public class ArquivoCNAB extends ParametrosEDI {
+
     /**
      * Váriáveis para informações do Registro zero (Header)
      */
@@ -23,9 +23,9 @@ public class ArquivoCNAB extends ParametrosEDI{
     private String tipoPessoaEmpresa;
     private String cpfCnpjEmpresa;
     private String horaGeracao;
-    
+
     /**
-     * Variáveis para informaões do Registro 2 (Detalhe)
+     * Variáveis para informaões do Registro 1 (Detalhe) de remessa
      */
     private String cdLoteDetalhe;
     private String cdSegmentoRegistro;
@@ -68,6 +68,18 @@ public class ArquivoCNAB extends ParametrosEDI{
     private String cdFormaCadTitBanco;
     private String cdCodigoProtesto;
     private String cdMoeda;
+    
+    /**
+     * Variáveis do registro 1 (detalhes) retorno
+     */
+    private String valorTarifaCobranca;
+    private String valorPrincipal;
+    private String valorOutrosCreditos;
+    private String cdBoletoDDA;
+    private String dataCredito;
+    private String cdInstrucaoCancelada;
+    private String mensagemErrosInfor;
+    private String cdLiquidacao;
 
     /**
      * @return the cdTipoRegistro
@@ -768,6 +780,116 @@ public class ArquivoCNAB extends ParametrosEDI{
     public void setCdMoeda(String cdMoeda) {
         this.cdMoeda = cdMoeda;
     }
-    
-    
+
+    /**
+     * @return the valorTarifaCobranca
+     */
+    public String getValorTarifaCobranca() {
+        return valorTarifaCobranca;
+    }
+
+    /**
+     * @param valorTarifaCobranca the valorTarifaCobranca to set
+     */
+    public void setValorTarifaCobranca(String valorTarifaCobranca) {
+        this.valorTarifaCobranca = valorTarifaCobranca;
+    }
+
+    /**
+     * @return the valorPrincipal
+     */
+    public String getValorPrincipal() {
+        return valorPrincipal;
+    }
+
+    /**
+     * @param valorPrincipal the valorPrincipal to set
+     */
+    public void setValorPrincipal(String valorPrincipal) {
+        this.valorPrincipal = valorPrincipal;
+    }
+
+    /**
+     * @return the valorOutrosCreditos
+     */
+    public String getValorOutrosCreditos() {
+        return valorOutrosCreditos;
+    }
+
+    /**
+     * @param valorOutrosCreditos the valorOutrosCreditos to set
+     */
+    public void setValorOutrosCreditos(String valorOutrosCreditos) {
+        this.valorOutrosCreditos = valorOutrosCreditos;
+    }
+
+    /**
+     * @return the cdBoletoDDA
+     */
+    public String getCdBoletoDDA() {
+        return cdBoletoDDA;
+    }
+
+    /**
+     * @param cdBoletoDDA the cdBoletoDDA to set
+     */
+    public void setCdBoletoDDA(String cdBoletoDDA) {
+        this.cdBoletoDDA = cdBoletoDDA;
+    }
+
+    /**
+     * @return the dataCredito
+     */
+    public String getDataCredito() {
+        return dataCredito;
+    }
+
+    /**
+     * @param dataCredito the dataCredito to set
+     */
+    public void setDataCredito(String dataCredito) {
+        this.dataCredito = dataCredito;
+    }
+
+    /**
+     * @return the cdInstrucaoCancelada
+     */
+    public String getCdInstrucaoCancelada() {
+        return cdInstrucaoCancelada;
+    }
+
+    /**
+     * @param cdInstrucaoCancelada the cdInstrucaoCancelada to set
+     */
+    public void setCdInstrucaoCancelada(String cdInstrucaoCancelada) {
+        this.cdInstrucaoCancelada = cdInstrucaoCancelada;
+    }
+
+    /**
+     * @return the mensagemErrosInfor
+     */
+    public String getMensagemErrosInfor() {
+        return mensagemErrosInfor;
+    }
+
+    /**
+     * @param mensagemErrosInfor the mensagemErrosInfor to set
+     */
+    public void setMensagemErrosInfor(String mensagemErrosInfor) {
+        this.mensagemErrosInfor = mensagemErrosInfor;
+    }
+
+    /**
+     * @return the cdLiquidacao
+     */
+    public String getCdLiquidacao() {
+        return cdLiquidacao;
+    }
+
+    /**
+     * @param cdLiquidacao the cdLiquidacao to set
+     */
+    public void setCdLiquidacao(String cdLiquidacao) {
+        this.cdLiquidacao = cdLiquidacao;
+    }
 }

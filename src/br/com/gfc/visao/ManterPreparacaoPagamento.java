@@ -28,6 +28,7 @@ import br.com.modelo.VerificarMouse;
 import br.com.modelo.VerificarTecla;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -38,6 +39,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JTable;
 import net.sf.jasperreports.engine.JRException;
@@ -157,7 +159,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
      * Método para instanciar controladores
      */
     private void carregaControles() {
-        cpp = new CPreparacaoPagamentos(conexao, su,pg);
+        cpp = new CPreparacaoPagamentos(conexao, su, pg);
         try {
             ctPortadores = new ConsultaTitulos(conexao);
             ctTitulos = new ConsultaTitulos(conexao);
@@ -612,6 +614,31 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         cpp.prepararBoleto(jTabPagamentosAgendados.getValueAt(linhaPagamAgend, 0).toString(), "BoletoItau.jasper");
     }
 
+    private void lerArquivoCNAB() throws IOException {
+        cnab = new ArquivoCNAB();
+        ccnab = new CArquivoCNAB(cnab, pg, conexao, "CN19029A.RET");
+        ccnab.lerArquivo();
+    }
+
+    /**
+     * Método para buscar o aquivo de retorno do banco
+     */
+    private void buscarArquivoCNAB() {
+        JFileChooser fc = new JFileChooser();
+        int option = fc.showOpenDialog(jPanel6);
+        if (option == fc.APPROVE_OPTION) {
+            File arq = fc.getSelectedFile();
+            try {
+                jTexArquivoRetorno.setText(arq.getCanonicalPath());
+                mensagemTela("getCanonicalPath: " + arq.getCanonicalPath() + "\ngetAbsolutePath: " + arq.getAbsolutePath()
+                        + "\ngetName: " + arq.getName() + "\ngetParent: " + arq.getParent() + "\ngetPath: " + arq.getPath()
+                        + "\ngetAbsoluteFile: " + arq.getAbsoluteFile() + "\ngetCanonicalFile: " + arq.getCanonicalFile());
+            } catch (IOException ex) {
+                Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
     /**
      * Método para retornar mensagem na tela
      *
@@ -721,6 +748,92 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jPanel5 = new javax.swing.JPanel();
         jButBoleto = new javax.swing.JButton();
         jButArquivoCnab = new javax.swing.JButton();
+        jButRetornoCNAB = new javax.swing.JButton();
+        jPanel6 = new javax.swing.JPanel();
+        jLabArquivoRetorno = new javax.swing.JLabel();
+        jTexArquivoRetorno = new javax.swing.JTextField();
+        jButArquivo = new javax.swing.JButton();
+        jPanRetornoDeArquivo = new javax.swing.JPanel();
+        jLabCodigoMovimento = new javax.swing.JLabel();
+        jTexCdMovimento = new javax.swing.JTextField();
+        jTexNomeMovimento = new javax.swing.JTextField();
+        jLabTipoServico = new javax.swing.JLabel();
+        jTexCdTipoServico = new javax.swing.JTextField();
+        jTexNomeTipoServico = new javax.swing.JTextField();
+        jLabDataArquivo = new javax.swing.JLabel();
+        jForDataArquivo = new javax.swing.JFormattedTextField();
+        jLabNomeEmpresa = new javax.swing.JLabel();
+        jTexNomeEmpresa = new javax.swing.JTextField();
+        jLabCdBanco = new javax.swing.JLabel();
+        jTexCdBanco = new javax.swing.JTextField();
+        jTexNomeBanco = new javax.swing.JTextField();
+        jLabAgenciaConta = new javax.swing.JLabel();
+        jTexCdAgencia = new javax.swing.JTextField();
+        jTexCdConta = new javax.swing.JTextField();
+        jLabContaDigito = new javax.swing.JLabel();
+        jTexCdDigConta = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        jFormattedTextField1 = new javax.swing.JFormattedTextField();
+        jLabContaDigito1 = new javax.swing.JLabel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        jTabDetalheCNAB = new javax.swing.JTable();
+        jPanDetalheArquivo = new javax.swing.JPanel();
+        jLabValorDespCobr = new javax.swing.JLabel();
+        jLabValorAbatConced = new javax.swing.JLabel();
+        jLabValorDescConced = new javax.swing.JLabel();
+        jLabValorLiqEmConta = new javax.swing.JLabel();
+        jLabValorJurosMoraMulta = new javax.swing.JLabel();
+        jLabValorOutrosCred = new javax.swing.JLabel();
+        jForValorDespCobranca = new javax.swing.JFormattedTextField();
+        jForValorAbatConcedido = new javax.swing.JFormattedTextField();
+        jForValorDescConcedido = new javax.swing.JFormattedTextField();
+        jForValorLiqEmConta = new javax.swing.JFormattedTextField();
+        jForValorJurosMoraMulta = new javax.swing.JFormattedTextField();
+        jForValorOutrosCred = new javax.swing.JFormattedTextField();
+        jLabValorIOF = new javax.swing.JLabel();
+        jForValorIOF = new javax.swing.JFormattedTextField();
+        jSeparator2 = new javax.swing.JSeparator();
+        jLabCdOcorrencia = new javax.swing.JLabel();
+        jLabCdIntrCancel = new javax.swing.JLabel();
+        jLabPagador = new javax.swing.JLabel();
+        jLabCdErroMensInfor = new javax.swing.JLabel();
+        jLabCdLiquidacao = new javax.swing.JLabel();
+        jLabDataCredLiquid = new javax.swing.JLabel();
+        jTexCdOcorrencia = new javax.swing.JTextField();
+        jTexNomeOcorrencia = new javax.swing.JTextField();
+        jTexCdIntrCancelamento = new javax.swing.JTextField();
+        jTexNomeIntrCancel = new javax.swing.JTextField();
+        jTexPagador = new javax.swing.JTextField();
+        jTexCdErroMensInformacao = new javax.swing.JTextField();
+        jTexNomeErroMensInfor = new javax.swing.JTextField();
+        jTexCdLiquidacao = new javax.swing.JTextField();
+        jTexNomeLiquidacao = new javax.swing.JTextField();
+        jForDataCredLiquidacao = new javax.swing.JFormattedTextField();
+        jLabSeqRegistro = new javax.swing.JLabel();
+        jTexSeqRegistro = new javax.swing.JTextField();
+        jPanel7 = new javax.swing.JPanel();
+        jLabQtdTitulosCobSimples = new javax.swing.JLabel();
+        jLabValorTituloCobSimples = new javax.swing.JLabel();
+        jLabAvisoBcoCobSimples = new javax.swing.JLabel();
+        jTexQtdTitulosCobSimples = new javax.swing.JTextField();
+        jTexAvisoBcoCobSimples = new javax.swing.JTextField();
+        jLabQtdTituloCobVinculada = new javax.swing.JLabel();
+        jTexQtdTituloCobVinculada = new javax.swing.JTextField();
+        jLabValorTituloCobVinculada = new javax.swing.JLabel();
+        jLabAvisoBcoCobVinculada = new javax.swing.JLabel();
+        jTexAvisoBcoCobVinculada = new javax.swing.JTextField();
+        jLabQtdTituloCobDirEscriturada = new javax.swing.JLabel();
+        jTexQtdTituloCobDirEscriturada = new javax.swing.JTextField();
+        jLabValTituloCobDirEscriturada = new javax.swing.JLabel();
+        jLabAvisoBcoCobDirEscriturada = new javax.swing.JLabel();
+        jTexAvisoBcoCobDirEscriturada = new javax.swing.JTextField();
+        jLabValorTotalInformado = new javax.swing.JLabel();
+        jLabQtdDetalhes = new javax.swing.JLabel();
+        jForValorTituloCobSimples = new javax.swing.JFormattedTextField();
+        jForValorTituloCobVinculada = new javax.swing.JFormattedTextField();
+        jForValTituloCobDirEscriturada = new javax.swing.JFormattedTextField();
+        jForValorTotalInformado = new javax.swing.JFormattedTextField();
+        jTexQtdDetalhes = new javax.swing.JTextField();
         jMenuBar = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -1785,12 +1898,23 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             }
         });
 
+        jButRetornoCNAB.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jButRetornoCNAB.setText("Retorno");
+        jButRetornoCNAB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButRetornoCNABActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButRetornoCNAB))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButArquivoCnab, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -1803,8 +1927,10 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addComponent(jButBoleto)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(2, 2, 2)
                 .addComponent(jButArquivoCnab)
+                .addGap(2, 2, 2)
+                .addComponent(jButRetornoCNAB)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1839,7 +1965,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                             .addGroup(jPanPagamentosAgendadosLayout.createSequentialGroup()
                                 .addGap(9, 9, 9)
                                 .addComponent(jButImprimirPrep))
-                            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                     .addComponent(jPanTitulosAgendados, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -1849,12 +1975,12 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanPagamentosAgendados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanSelecionados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanTotaisSelecao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1870,6 +1996,558 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
 
         jTabbedPane.addTab("Preparados", jPanel3);
 
+        jLabArquivoRetorno.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabArquivoRetorno.setText("Arquivo retorno:");
+
+        jTexArquivoRetorno.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTexArquivoRetornoKeyPressed(evt);
+            }
+        });
+
+        jButArquivo.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jButArquivo.setText("arquivo");
+        jButArquivo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButArquivoActionPerformed(evt);
+            }
+        });
+
+        jPanRetornoDeArquivo.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Retorno Bancário", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 13))); // NOI18N
+
+        jLabCodigoMovimento.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabCodigoMovimento.setText("Código/Movimento:");
+
+        jLabTipoServico.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabTipoServico.setText("Tipo Serviço:");
+
+        jLabDataArquivo.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabDataArquivo.setText("Data do Arquivo:");
+
+        try {
+            jForDataArquivo.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##/##/####")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+
+        jLabNomeEmpresa.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabNomeEmpresa.setText("Empresa:");
+
+        jLabCdBanco.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabCdBanco.setText("Banco:");
+
+        jLabAgenciaConta.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabAgenciaConta.setText("Agência/Conta:");
+
+        jLabContaDigito.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabContaDigito.setText("-");
+
+        jLabel9.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabel9.setText("Data Crédito:");
+
+        try {
+            jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##/##/####")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+
+        jLabContaDigito1.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabContaDigito1.setText("/");
+
+        jTabDetalheCNAB.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "Selec.", "Nosso Num.", "DAC", "Carteira", "Cod.Cart.", "Dt.Ocorr.", "Doc", "Esp.Doc", "Num.Banco", "Dt.Vencimento", "Valor Titulo"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Boolean.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane6.setViewportView(jTabDetalheCNAB);
+        if (jTabDetalheCNAB.getColumnModel().getColumnCount() > 0) {
+            jTabDetalheCNAB.getColumnModel().getColumn(0).setResizable(false);
+            jTabDetalheCNAB.getColumnModel().getColumn(0).setPreferredWidth(10);
+            jTabDetalheCNAB.getColumnModel().getColumn(1).setResizable(false);
+            jTabDetalheCNAB.getColumnModel().getColumn(1).setPreferredWidth(30);
+            jTabDetalheCNAB.getColumnModel().getColumn(2).setResizable(false);
+            jTabDetalheCNAB.getColumnModel().getColumn(2).setPreferredWidth(10);
+            jTabDetalheCNAB.getColumnModel().getColumn(3).setResizable(false);
+            jTabDetalheCNAB.getColumnModel().getColumn(3).setPreferredWidth(10);
+            jTabDetalheCNAB.getColumnModel().getColumn(4).setResizable(false);
+            jTabDetalheCNAB.getColumnModel().getColumn(4).setPreferredWidth(10);
+            jTabDetalheCNAB.getColumnModel().getColumn(5).setResizable(false);
+            jTabDetalheCNAB.getColumnModel().getColumn(5).setPreferredWidth(30);
+            jTabDetalheCNAB.getColumnModel().getColumn(6).setResizable(false);
+            jTabDetalheCNAB.getColumnModel().getColumn(6).setPreferredWidth(30);
+            jTabDetalheCNAB.getColumnModel().getColumn(7).setResizable(false);
+            jTabDetalheCNAB.getColumnModel().getColumn(7).setPreferredWidth(20);
+            jTabDetalheCNAB.getColumnModel().getColumn(8).setResizable(false);
+            jTabDetalheCNAB.getColumnModel().getColumn(8).setPreferredWidth(30);
+            jTabDetalheCNAB.getColumnModel().getColumn(9).setResizable(false);
+            jTabDetalheCNAB.getColumnModel().getColumn(9).setPreferredWidth(30);
+            jTabDetalheCNAB.getColumnModel().getColumn(10).setResizable(false);
+            jTabDetalheCNAB.getColumnModel().getColumn(10).setPreferredWidth(60);
+        }
+
+        jPanDetalheArquivo.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Registro Detalhe:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 13))); // NOI18N
+
+        jLabValorDespCobr.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabValorDespCobr.setText("Desp. Cobrança (R$):");
+
+        jLabValorAbatConced.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabValorAbatConced.setText("Abat. Concedido (R$):");
+
+        jLabValorDescConced.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabValorDescConced.setText("Desc. Concedido (R$):");
+
+        jLabValorLiqEmConta.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabValorLiqEmConta.setText("Líquido em conta (R$):");
+
+        jLabValorJurosMoraMulta.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabValorJurosMoraMulta.setText("Juro Mora/Multa (R$):");
+
+        jLabValorOutrosCred.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabValorOutrosCred.setText("Outros Créditos (R$):");
+
+        jLabValorIOF.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabValorIOF.setText("IOF (R$):");
+
+        jSeparator2.setBorder(javax.swing.BorderFactory.createEtchedBorder(java.awt.Color.gray, null));
+
+        jLabCdOcorrencia.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabCdOcorrencia.setText("Cod. Ocorr.:");
+
+        jLabCdIntrCancel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabCdIntrCancel.setText("Cod. Intr. Canc.:");
+
+        jLabPagador.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabPagador.setText("Pagador:");
+
+        jLabCdErroMensInfor.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabCdErroMensInfor.setText("Cod. Erro / Msg Infor.:");
+
+        jLabCdLiquidacao.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabCdLiquidacao.setText("Cod. Liq.:");
+
+        jLabDataCredLiquid.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabDataCredLiquid.setText("Dt Créd. Liq.");
+
+        jLabSeqRegistro.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabSeqRegistro.setText("Seq. Registro:");
+
+        javax.swing.GroupLayout jPanDetalheArquivoLayout = new javax.swing.GroupLayout(jPanDetalheArquivo);
+        jPanDetalheArquivo.setLayout(jPanDetalheArquivoLayout);
+        jPanDetalheArquivoLayout.setHorizontalGroup(
+            jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabValorDespCobr)
+                    .addComponent(jLabValorAbatConced)
+                    .addComponent(jLabValorDescConced)
+                    .addComponent(jLabValorLiqEmConta)
+                    .addComponent(jLabValorJurosMoraMulta)
+                    .addComponent(jLabValorOutrosCred)
+                    .addComponent(jLabValorIOF))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jForValorJurosMoraMulta, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
+                        .addComponent(jForValorLiqEmConta)
+                        .addComponent(jForValorOutrosCred))
+                    .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jForValorAbatConcedido, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
+                        .addComponent(jForValorDespCobranca, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jForValorDescConcedido, javax.swing.GroupLayout.Alignment.LEADING))
+                    .addComponent(jForValorIOF, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
+                        .addComponent(jLabDataCredLiquid)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jForDataCredLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 212, Short.MAX_VALUE)
+                        .addComponent(jLabSeqRegistro)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTexSeqRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
+                        .addComponent(jLabPagador)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTexPagador))
+                    .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
+                        .addComponent(jLabCdLiquidacao)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTexCdLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTexNomeLiquidacao))
+                    .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
+                        .addComponent(jLabCdOcorrencia)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTexCdOcorrencia, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTexNomeOcorrencia))
+                    .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
+                                .addComponent(jLabCdIntrCancel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTexCdIntrCancelamento))
+                            .addComponent(jLabCdErroMensInfor))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
+                                .addComponent(jTexCdErroMensInformacao, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTexNomeErroMensInfor))
+                            .addComponent(jTexNomeIntrCancel))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanDetalheArquivoLayout.setVerticalGroup(
+            jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
+                .addGap(2, 2, 2)
+                .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanDetalheArquivoLayout.createSequentialGroup()
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabValorDespCobr, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jForValorDespCobranca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabValorAbatConced, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jForValorAbatConcedido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabValorDescConced, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jForValorDescConcedido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabValorLiqEmConta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jForValorLiqEmConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabValorJurosMoraMulta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jForValorJurosMoraMulta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabValorOutrosCred, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jForValorOutrosCred, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabValorIOF)
+                            .addComponent(jForValorIOF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabCdOcorrencia)
+                            .addComponent(jTexCdOcorrencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTexNomeOcorrencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabCdIntrCancel)
+                            .addComponent(jTexCdIntrCancelamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTexNomeIntrCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabPagador)
+                            .addComponent(jTexPagador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabCdErroMensInfor)
+                            .addComponent(jTexCdErroMensInformacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTexNomeErroMensInfor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabCdLiquidacao)
+                            .addComponent(jTexCdLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTexNomeLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabDataCredLiquid)
+                            .addComponent(jForDataCredLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabSeqRegistro)
+                                .addComponent(jTexSeqRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE))))
+        );
+
+        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Registro Trailer", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 13))); // NOI18N
+
+        jLabQtdTitulosCobSimples.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabQtdTitulosCobSimples.setText("Qt. Tit. Cob. Simples:");
+
+        jLabValorTituloCobSimples.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabValorTituloCobSimples.setText("Val. Tit. Cob. Simples:");
+
+        jLabAvisoBcoCobSimples.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabAvisoBcoCobSimples.setText("Ref.aviso Bco:");
+
+        jLabQtdTituloCobVinculada.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabQtdTituloCobVinculada.setText("Qt.Tit.Cob. Vinculada:");
+
+        jLabValorTituloCobVinculada.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabValorTituloCobVinculada.setText("Val.Tit.Cob.Vinculada:");
+
+        jLabAvisoBcoCobVinculada.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabAvisoBcoCobVinculada.setText("Ref.aviso Bco:");
+
+        jLabQtdTituloCobDirEscriturada.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabQtdTituloCobDirEscriturada.setText("Qt.Tit.Cob.Dir.Escrit:");
+
+        jLabValTituloCobDirEscriturada.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabValTituloCobDirEscriturada.setText("Val.Tit.Cob.Dir.Escrit:");
+
+        jLabAvisoBcoCobDirEscriturada.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabAvisoBcoCobDirEscriturada.setText("Ref.aviso Bco:");
+
+        jLabValorTotalInformado.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabValorTotalInformado.setText("Vl. Tot, Infor.:");
+
+        jLabQtdDetalhes.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabQtdDetalhes.setText("Qt. detalhes:");
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabAvisoBcoCobSimples, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabValorTituloCobSimples, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabQtdTitulosCobSimples, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jForValorTituloCobSimples)
+                    .addComponent(jTexQtdTitulosCobSimples, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTexAvisoBcoCobSimples, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabValorTituloCobVinculada)
+                    .addComponent(jLabAvisoBcoCobVinculada)
+                    .addComponent(jLabQtdTituloCobVinculada))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jForValorTituloCobVinculada)
+                    .addComponent(jTexAvisoBcoCobVinculada, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                    .addComponent(jTexQtdTituloCobVinculada, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabValTituloCobDirEscriturada)
+                    .addComponent(jLabQtdTituloCobDirEscriturada)
+                    .addComponent(jLabAvisoBcoCobDirEscriturada))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jTexAvisoBcoCobDirEscriturada, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                            .addComponent(jForValTituloCobDirEscriturada))
+                        .addGap(33, 33, 33)
+                        .addComponent(jLabQtdDetalhes)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTexQtdDetalhes))
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addComponent(jTexQtdTituloCobDirEscriturada, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabValorTotalInformado)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jForValorTotalInformado, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabQtdTituloCobDirEscriturada)
+                                    .addComponent(jTexQtdTituloCobDirEscriturada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabValorTotalInformado)
+                                    .addComponent(jForValorTotalInformado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(2, 2, 2)
+                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabValTituloCobDirEscriturada)
+                                    .addComponent(jLabQtdDetalhes)
+                                    .addComponent(jForValTituloCobDirEscriturada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jTexQtdDetalhes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(2, 2, 2)
+                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabAvisoBcoCobDirEscriturada)
+                                    .addComponent(jTexAvisoBcoCobDirEscriturada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabQtdTitulosCobSimples)
+                                    .addComponent(jTexQtdTitulosCobSimples, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabQtdTituloCobVinculada)
+                                    .addComponent(jTexQtdTituloCobVinculada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(2, 2, 2)
+                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabValorTituloCobSimples)
+                                    .addComponent(jForValorTituloCobSimples, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabValorTituloCobVinculada)
+                                    .addComponent(jForValorTituloCobVinculada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(2, 2, 2)
+                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabAvisoBcoCobSimples)
+                                    .addComponent(jTexAvisoBcoCobSimples, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabAvisoBcoCobVinculada)
+                        .addComponent(jTexAvisoBcoCobVinculada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(2, 2, 2))
+        );
+
+        javax.swing.GroupLayout jPanRetornoDeArquivoLayout = new javax.swing.GroupLayout(jPanRetornoDeArquivo);
+        jPanRetornoDeArquivo.setLayout(jPanRetornoDeArquivoLayout);
+        jPanRetornoDeArquivoLayout.setHorizontalGroup(
+            jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanRetornoDeArquivoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanRetornoDeArquivoLayout.createSequentialGroup()
+                            .addComponent(jLabCodigoMovimento)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jTexCdMovimento, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jTexNomeMovimento, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(18, 18, 18)
+                            .addComponent(jLabTipoServico)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jTexCdTipoServico, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jTexNomeTipoServico, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabDataArquivo)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jForDataArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanRetornoDeArquivoLayout.createSequentialGroup()
+                            .addComponent(jLabNomeEmpresa)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jTexNomeEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(18, 18, 18)
+                            .addComponent(jLabCdBanco)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jTexCdBanco, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jTexNomeBanco, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(18, 18, 18)
+                            .addComponent(jLabAgenciaConta)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jTexCdAgencia, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jLabContaDigito1)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jTexCdConta, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jLabContaDigito)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jTexCdDigConta, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(18, 18, 18)
+                            .addComponent(jLabel9)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jPanDetalheArquivo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanRetornoDeArquivoLayout.setVerticalGroup(
+            jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanRetornoDeArquivoLayout.createSequentialGroup()
+                .addGap(2, 2, 2)
+                .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabCodigoMovimento)
+                    .addComponent(jTexCdMovimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTexNomeMovimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabTipoServico)
+                    .addComponent(jTexCdTipoServico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTexNomeTipoServico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabDataArquivo)
+                    .addComponent(jForDataArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(2, 2, 2)
+                .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabNomeEmpresa)
+                    .addComponent(jTexNomeEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabCdBanco)
+                    .addComponent(jTexCdBanco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTexNomeBanco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabAgenciaConta)
+                    .addComponent(jTexCdAgencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTexCdConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabContaDigito)
+                    .addComponent(jTexCdDigConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel9)
+                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabContaDigito1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanDetalheArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(jPanRetornoDeArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(jLabArquivoRetorno)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTexArquivoRetorno, javax.swing.GroupLayout.PREFERRED_SIZE, 608, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButArquivo)
+                        .addGap(387, 517, Short.MAX_VALUE))))
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(2, 2, 2)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabArquivoRetorno)
+                    .addComponent(jTexArquivoRetorno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButArquivo))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanRetornoDeArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jTabbedPane.addTab("CNAB", jPanel6);
+
         javax.swing.GroupLayout jPanGeralLayout = new javax.swing.GroupLayout(jPanGeral);
         jPanGeral.setLayout(jPanGeralLayout);
         jPanGeralLayout.setHorizontalGroup(
@@ -1877,14 +2555,14 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             .addGroup(jPanGeralLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanGeralLayout.setVerticalGroup(
             jPanGeralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanGeralLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 663, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         jMenuBar.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -2113,6 +2791,25 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButBoletoActionPerformed
 
+    private void jButRetornoCNABActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButRetornoCNABActionPerformed
+        try {
+            lerArquivoCNAB();
+        } catch (IOException ex) {
+            Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButRetornoCNABActionPerformed
+
+    private void jTexArquivoRetornoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTexArquivoRetornoKeyPressed
+        VerificarTecla vt = new VerificarTecla();
+        if ("F5".equals(vt.VerificarTecla(evt).toUpperCase())) {
+            buscarArquivoCNAB();
+        }
+    }//GEN-LAST:event_jTexArquivoRetornoKeyPressed
+
+    private void jButArquivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButArquivoActionPerformed
+        buscarArquivoCNAB();
+    }//GEN-LAST:event_jButArquivoActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -2150,6 +2847,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButAnterior;
+    private javax.swing.JButton jButArquivo;
     private javax.swing.JButton jButArquivoCnab;
     private javax.swing.JButton jButBoleto;
     private javax.swing.JButton jButBuscar;
@@ -2163,6 +2861,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JButton jButPesquisar;
     private javax.swing.JButton jButPreparar;
     private javax.swing.JButton jButProximo;
+    private javax.swing.JButton jButRetornoCNAB;
     private javax.swing.JButton jButSair;
     private javax.swing.JButton jButSalvar;
     private javax.swing.JButton jButSalvarPreparacao;
@@ -2174,6 +2873,8 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JFormattedTextField jForDatEmissaoIni;
     private javax.swing.JFormattedTextField jForDatVencimentoFin;
     private javax.swing.JFormattedTextField jForDatVencimentoIni;
+    private javax.swing.JFormattedTextField jForDataArquivo;
+    private javax.swing.JFormattedTextField jForDataCredLiquidacao;
     private javax.swing.JFormattedTextField jForDataLiquidacaoAte;
     private javax.swing.JFormattedTextField jForDataLiquidacaoDe;
     private javax.swing.JFormattedTextField jForEmissaoTitulo;
@@ -2181,7 +2882,34 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JFormattedTextField jForQtdeTitulos;
     private javax.swing.JFormattedTextField jForTotTitPagar;
     private javax.swing.JFormattedTextField jForTotTitReceber;
+    private javax.swing.JFormattedTextField jForValTituloCobDirEscriturada;
     private javax.swing.JFormattedTextField jForValTotTitulos;
+    private javax.swing.JFormattedTextField jForValorAbatConcedido;
+    private javax.swing.JFormattedTextField jForValorDescConcedido;
+    private javax.swing.JFormattedTextField jForValorDespCobranca;
+    private javax.swing.JFormattedTextField jForValorIOF;
+    private javax.swing.JFormattedTextField jForValorJurosMoraMulta;
+    private javax.swing.JFormattedTextField jForValorLiqEmConta;
+    private javax.swing.JFormattedTextField jForValorOutrosCred;
+    private javax.swing.JFormattedTextField jForValorTituloCobSimples;
+    private javax.swing.JFormattedTextField jForValorTituloCobVinculada;
+    private javax.swing.JFormattedTextField jForValorTotalInformado;
+    private javax.swing.JFormattedTextField jFormattedTextField1;
+    private javax.swing.JLabel jLabAgenciaConta;
+    private javax.swing.JLabel jLabArquivoRetorno;
+    private javax.swing.JLabel jLabAvisoBcoCobDirEscriturada;
+    private javax.swing.JLabel jLabAvisoBcoCobSimples;
+    private javax.swing.JLabel jLabAvisoBcoCobVinculada;
+    private javax.swing.JLabel jLabCdBanco;
+    private javax.swing.JLabel jLabCdErroMensInfor;
+    private javax.swing.JLabel jLabCdIntrCancel;
+    private javax.swing.JLabel jLabCdLiquidacao;
+    private javax.swing.JLabel jLabCdOcorrencia;
+    private javax.swing.JLabel jLabCodigoMovimento;
+    private javax.swing.JLabel jLabContaDigito;
+    private javax.swing.JLabel jLabContaDigito1;
+    private javax.swing.JLabel jLabDataArquivo;
+    private javax.swing.JLabel jLabDataCredLiquid;
     private javax.swing.JLabel jLabDataEmissao;
     private javax.swing.JLabel jLabDataLiquidacao;
     private javax.swing.JLabel jLabDocumento;
@@ -2189,19 +2917,39 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JLabel jLabInfoTipoMovimento;
     private javax.swing.JLabel jLabInfoTipoPagamento;
     private javax.swing.JLabel jLabNomeCliente;
+    private javax.swing.JLabel jLabNomeEmpresa;
     private javax.swing.JLabel jLabNumPreparacao;
+    private javax.swing.JLabel jLabPagador;
     private javax.swing.JLabel jLabPagarReceber;
+    private javax.swing.JLabel jLabQtdDetalhes;
+    private javax.swing.JLabel jLabQtdTituloCobDirEscriturada;
+    private javax.swing.JLabel jLabQtdTituloCobVinculada;
+    private javax.swing.JLabel jLabQtdTitulosCobSimples;
     private javax.swing.JLabel jLabQtdeTitulos;
+    private javax.swing.JLabel jLabSeqRegistro;
     private javax.swing.JLabel jLabSituacao;
     private javax.swing.JLabel jLabTipoLancamento;
+    private javax.swing.JLabel jLabTipoServico;
     private javax.swing.JLabel jLabTotTitPagar;
     private javax.swing.JLabel jLabTotTitReceber;
+    private javax.swing.JLabel jLabValTituloCobDirEscriturada;
     private javax.swing.JLabel jLabValTotTitulos;
+    private javax.swing.JLabel jLabValorAbatConced;
+    private javax.swing.JLabel jLabValorDescConced;
+    private javax.swing.JLabel jLabValorDespCobr;
+    private javax.swing.JLabel jLabValorIOF;
+    private javax.swing.JLabel jLabValorJurosMoraMulta;
+    private javax.swing.JLabel jLabValorLiqEmConta;
+    private javax.swing.JLabel jLabValorOutrosCred;
+    private javax.swing.JLabel jLabValorTituloCobSimples;
+    private javax.swing.JLabel jLabValorTituloCobVinculada;
+    private javax.swing.JLabel jLabValorTotalInformado;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar;
@@ -2211,10 +2959,12 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItemSalvar;
     private javax.swing.JPanel jPanBotoesTitulo;
     private javax.swing.JPanel jPanCliente;
+    private javax.swing.JPanel jPanDetalheArquivo;
     private javax.swing.JPanel jPanFiltros;
     private javax.swing.JPanel jPanGeral;
     private javax.swing.JPanel jPanInfoPortador;
     private javax.swing.JPanel jPanPagamentosAgendados;
+    private javax.swing.JPanel jPanRetornoDeArquivo;
     private javax.swing.JPanel jPanSelecionados;
     private javax.swing.JPanel jPanTitulos;
     private javax.swing.JPanel jPanTitulosAgendados;
@@ -2225,26 +2975,59 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JTable jTabDetalheCNAB;
     private javax.swing.JTable jTabPagamentosAgendados;
     private javax.swing.JTable jTabPortadores;
     private javax.swing.JTable jTabTitulo;
     private javax.swing.JTable jTabTituloSelecionados;
     private javax.swing.JTable jTabTitulosAgendados;
     private javax.swing.JTabbedPane jTabbedPane;
+    private javax.swing.JTextField jTexArquivoRetorno;
+    private javax.swing.JTextField jTexAvisoBcoCobDirEscriturada;
+    private javax.swing.JTextField jTexAvisoBcoCobSimples;
+    private javax.swing.JTextField jTexAvisoBcoCobVinculada;
+    private javax.swing.JTextField jTexCdAgencia;
+    private javax.swing.JTextField jTexCdBanco;
+    private javax.swing.JTextField jTexCdConta;
+    private javax.swing.JTextField jTexCdDigConta;
+    private javax.swing.JTextField jTexCdErroMensInformacao;
     private javax.swing.JTextField jTexCdInfoPortador;
     private javax.swing.JTextField jTexCdInfoTipoMovimento;
     private javax.swing.JTextField jTexCdInfoTipoPagamento;
+    private javax.swing.JTextField jTexCdIntrCancelamento;
+    private javax.swing.JTextField jTexCdLiquidacao;
+    private javax.swing.JTextField jTexCdMovimento;
+    private javax.swing.JTextField jTexCdOcorrencia;
+    private javax.swing.JTextField jTexCdTipoServico;
     private javax.swing.JTextField jTexDocumento;
+    private javax.swing.JTextField jTexNomeBanco;
     private javax.swing.JTextField jTexNomeCliente;
+    private javax.swing.JTextField jTexNomeEmpresa;
+    private javax.swing.JTextField jTexNomeErroMensInfor;
     private javax.swing.JTextField jTexNomeInfoPortador;
     private javax.swing.JTextField jTexNomeInfoTipoMovimento;
     private javax.swing.JTextField jTexNomeInfoTipoPagamento;
+    private javax.swing.JTextField jTexNomeIntrCancel;
+    private javax.swing.JTextField jTexNomeLiquidacao;
+    private javax.swing.JTextField jTexNomeMovimento;
+    private javax.swing.JTextField jTexNomeOcorrencia;
     private javax.swing.JTextField jTexNomeRazaoSocial;
+    private javax.swing.JTextField jTexNomeTipoServico;
+    private javax.swing.JTextField jTexPagador;
+    private javax.swing.JTextField jTexQtdDetalhes;
+    private javax.swing.JTextField jTexQtdTituloCobDirEscriturada;
+    private javax.swing.JTextField jTexQtdTituloCobVinculada;
+    private javax.swing.JTextField jTexQtdTitulosCobSimples;
+    private javax.swing.JTextField jTexSeqRegistro;
     private javax.swing.JTextField jTexTipoDocumento;
     private javax.swing.JToolBar jTooMenuFerramentas;
     // End of variables declaration//GEN-END:variables

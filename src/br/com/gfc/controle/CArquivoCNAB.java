@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -28,16 +29,33 @@ import javax.swing.JOptionPane;
  */
 public class CArquivoCNAB {
 
+    /**
+     * Objetos dependentes da classe
+     */
     private ArquivoCNAB cnab;
     private ParametrosGerais pg;
     private Connection conexao;
     private CPosicionarArquivo cpc;
+    private static FileReader entrada;
+    private Scanner ler;
+
+    /**
+     * Variáveis de instância para geração do arquivo
+     */
     private String cdPreparacao;
     private String io;
     private static FileWriter saida;
-    private static FileReader entrada;
     private String[] arquivo;
     private int idxArq = 1;
+
+    /**
+     * Variáveis de instância para leitura do arquivo
+     */
+    private String nomeArquivo;
+    private String registro;
+    private String[] detalhe;
+    private String[] head;
+    private String[] trailer;
 
     /**
      * Construto padrão
@@ -70,6 +88,23 @@ public class CArquivoCNAB {
     }
 
     /**
+     * Construtor para ser utilzado para ler o arquivo de retorno do banco
+     *
+     * @param cnab
+     * @param pg
+     * @param conexao
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public CArquivoCNAB(ArquivoCNAB cnab, ParametrosGerais pg, Connection conexao, String nomeArquivo) throws FileNotFoundException, IOException {
+        this.cnab = cnab;
+        this.pg = pg;
+        this.conexao = conexao;
+        this.nomeArquivo = nomeArquivo;
+        setaVariaveisLeitura();
+    }
+
+    /**
      * Método para setar as variáveis de ambiente para escrever no arquivo
      *
      * @throws FileNotFoundException
@@ -83,10 +118,11 @@ public class CArquivoCNAB {
      * Método para setar as variáveis de leitura do arquivo
      *
      * @throws FileNotFoundException
+     * @throws IOException
      */
-    private void setaVariaveisLeitura() throws FileNotFoundException {
-        entrada = new FileReader(pg.getLocalBoletoBanco() + "retornoItau.txt");
-
+    private void setaVariaveisLeitura() throws FileNotFoundException, IOException {
+        entrada = new FileReader(pg.getLocalBoletoBanco() + nomeArquivo);
+        ler = new Scanner(entrada);
     }
 
     /**
@@ -122,6 +158,33 @@ public class CArquivoCNAB {
         return 0;
     }
 
+    public int lerArquivo() {
+        try {
+            do {
+                registro = ler.nextLine();
+                cnab.setCdTipoRegistro(registro.substring(0, 1));
+                if ("0".equals(cnab.getCdTipoRegistro())) {
+                    if (lerHeadItau() == 0) {
+                        return 0;
+                    }
+                } else if ("1".equals(cnab.getCdTipoRegistro())) {
+                    if (lerDetalheItau() == 0) {
+                        return 0;
+                    }
+                } else if ("9".equals(cnab.getCdTipoRegistro())) {
+                    if (lerTrailerItau() == 0) {
+                        return 0;
+                    }
+                }
+
+            } while (!"9".equals(cnab.getCdTipoRegistro()));
+            return 1;
+        } catch (Exception e) {
+            mensagem("Erro na leitura do arquivo!\nErro: " + e);
+            return 0;
+        }
+    }
+
     /**
      * Método para criar o cabecalho do arquivo
      *
@@ -139,6 +202,22 @@ public class CArquivoCNAB {
         //mensagem("Arquivo: " + arquivo[idxArq]);
         idxArq++;
         return 1;
+    }
+
+    /**
+     * Método para ler o cabecalho do arquivo
+     *
+     * @return returna 1 caso o arquivo tenha sido lido e 0 caso ocorra erro.
+     */
+    private int lerHeadItau() {
+        int[] tamanho = {1, 1, 7, 2, 15, 4, 2, 5, 1, 8, 30, 3, 15, 6, 5, 3, 5, 6, 275, 6};
+        head = lerRegistroDoArquivo(tamanho);
+        if (head.length == tamanho.length) {
+            return 1;
+        } else {
+            mensagem("Erro na leitura do cabecalho arquivo!");
+            return 0;
+        }
     }
 
     /**
@@ -208,6 +287,23 @@ public class CArquivoCNAB {
     }
 
     /**
+     * Método para ler o detalhe do arquivo do itau
+     *
+     * @return returna 1 caso o arquivo tenha sido lido e 0 caso ocorra erro.
+     */
+    private int lerDetalheItau() {
+        int[] tamanho = {1, 2, 14, 4, 2, 5, 1, 8, 25, 8, 12, 3, 8, 1, 13, 1, 2, 6, 10, 8, 12, 6, 13, 3, 4, 1, 2, 13, 26, 13, 13, 13, 13, 13, 13,
+            1, 2, 6, 4, 6, 13, 30, 23, 8, 7, 2, 6};
+        detalhe = lerRegistroDoArquivo(tamanho);
+        if (detalhe.length == tamanho.length) {
+            return 1;
+        } else {
+            mensagem("Erro na leitura do detalhe do arquivo!");
+            return 0;
+        }
+    }
+
+    /**
      * Método para criar o detalhe de multa do arquivo
      *
      * @return
@@ -242,6 +338,41 @@ public class CArquivoCNAB {
     }
 
     /**
+     * Método para ler o trailer do arquivo do itau
+     *
+     * @return returna 1 caso o arquivo tenha sido lido e 0 caso ocorra erro.
+     */
+    private int lerTrailerItau() {
+        int[] tamanho = {1, 1, 2, 3, 10, 8, 14, 8, 10, 8, 14, 8, 90, 8, 14, 8, 5, 8, 14, 160, 6};
+        trailer = lerRegistroDoArquivo(tamanho);
+        if (trailer.length == tamanho.length) {
+            return 1;
+        } else {
+            mensagem("Erro na leitura do trailer do arquivo!");
+            return 0;
+        }
+    }
+
+    /**
+     * Método para ler os registros do arquivo
+     *
+     * @param tamanho array contendo o tamanho de cada campo
+     * @return retorna array de string com os campos lidos no arquivo
+     */
+    private String[] lerRegistroDoArquivo(int[] tamanho) {
+        int posicao = 0;
+        int campo = 0;
+        String[] campos = new String[tamanho.length];
+        for (int i = 0; i < tamanho.length; i++) {
+            campos[campo] = registro.substring(posicao, tamanho[i] + posicao);
+            mensagem("\nInteracao: " + campo + "\nPosicao: " + (posicao + 1) + "\nTamanho: " + tamanho[i] + "\nConteudo: " + campos[campo]);
+            posicao += tamanho[i];
+            campo++;
+        }
+        return campos;
+    }
+
+    /**
      * Gerar o arquivo no disco
      *
      * @return
@@ -256,11 +387,6 @@ public class CArquivoCNAB {
             cont++;
         } while (cont < idxArq);
         saida.close();
-        return 1;
-    }
-
-    public int lerArquivo() {
-        int cont = 1;
         return 1;
     }
 
