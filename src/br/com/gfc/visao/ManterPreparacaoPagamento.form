@@ -2055,19 +2055,19 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Component id="jPanRetornoDeArquivo" max="32767" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="jPanRetornoDeArquivo" max="32767" attributes="0"/>
                               <Group type="102" attributes="0">
                                   <Component id="jLabArquivoRetorno" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="jTexArquivoRetorno" min="-2" pref="608" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="jButArquivo" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="387" pref="517" max="32767" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
                           </Group>
+                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -2079,6 +2079,7 @@
                               <Component id="jLabArquivoRetorno" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jTexArquivoRetorno" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jButArquivo" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jPanRetornoDeArquivo" max="32767" attributes="0"/>
@@ -2173,9 +2174,9 @@
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="jTexCdDigConta" min="-2" pref="33" max="-2" attributes="0"/>
                                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                                          <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
+                                          <Component id="jLabDataCreditoArquivo" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="jFormattedTextField1" min="-2" pref="103" max="-2" attributes="0"/>
+                                          <Component id="jForDataCreditoArquivo" min="-2" pref="103" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                                   <Group type="103" groupAlignment="1" max="-2" attributes="0">
@@ -2214,8 +2215,8 @@
                                   <Component id="jTexCdConta" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabContaDigito" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="jTexCdDigConta" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jFormattedTextField1" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabDataCreditoArquivo" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jForDataCreditoArquivo" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabContaDigito1" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
@@ -2312,7 +2313,7 @@
                     </Component>
                     <Component class="javax.swing.JTextField" name="jTexCdDigConta">
                     </Component>
-                    <Component class="javax.swing.JLabel" name="jLabel9">
+                    <Component class="javax.swing.JLabel" name="jLabDataCreditoArquivo">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                           <Font name="Tahoma" size="13" style="1"/>
@@ -2320,7 +2321,7 @@
                         <Property name="text" type="java.lang.String" value="Data Cr&#xe9;dito:"/>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JFormattedTextField" name="jFormattedTextField1">
+                    <Component class="javax.swing.JFormattedTextField" name="jForDataCreditoArquivo">
                       <Properties>
                         <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor" preCode="try {" postCode="} catch (java.text.ParseException ex) {&#xa;ex.printStackTrace();&#xa;}">
                           <Format format="##/##/####" subtype="-1" type="5"/>
@@ -2345,8 +2346,7 @@
                         <Component class="javax.swing.JTable" name="jTabDetalheCNAB">
                           <Properties>
                             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-                              <Table columnCount="11" rowCount="10">
-                                <Column editable="false" title="Selec." type="java.lang.Boolean"/>
+                              <Table columnCount="10" rowCount="10">
                                 <Column editable="false" title="Nosso Num." type="java.lang.String"/>
                                 <Column editable="false" title="DAC" type="java.lang.String"/>
                                 <Column editable="false" title="Carteira" type="java.lang.String"/>
@@ -2356,16 +2356,11 @@
                                 <Column editable="false" title="Esp.Doc" type="java.lang.String"/>
                                 <Column editable="false" title="Num.Banco" type="java.lang.String"/>
                                 <Column editable="false" title="Dt.Vencimento" type="java.lang.String"/>
-                                <Column editable="false" title="Valor Titulo" type="java.lang.String"/>
+                                <Column editable="false" title="Valor Titulo" type="java.lang.Double"/>
                               </Table>
                             </Property>
                             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
                               <TableColumnModel selectionModel="0">
-                                <Column maxWidth="-1" minWidth="-1" prefWidth="10" resizable="false">
-                                  <Title/>
-                                  <Editor/>
-                                  <Renderer/>
-                                </Column>
                                 <Column maxWidth="-1" minWidth="-1" prefWidth="30" resizable="false">
                                   <Title/>
                                   <Editor/>
@@ -2595,12 +2590,14 @@
                                               <Component id="jTexNomeLiquidacao" alignment="3" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                           <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
-                                          <Group type="103" groupAlignment="3" attributes="0">
-                                              <Component id="jLabDataCredLiquid" alignment="3" min="-2" max="-2" attributes="0"/>
-                                              <Component id="jForDataCredLiquidacao" alignment="3" min="-2" max="-2" attributes="0"/>
-                                              <Group type="103" alignment="3" groupAlignment="3" attributes="0">
+                                          <Group type="103" groupAlignment="0" attributes="0">
+                                              <Group type="103" alignment="0" groupAlignment="3" attributes="0">
                                                   <Component id="jLabSeqRegistro" alignment="3" min="-2" max="-2" attributes="0"/>
                                                   <Component id="jTexSeqRegistro" alignment="3" min="-2" max="-2" attributes="0"/>
+                                              </Group>
+                                              <Group type="103" groupAlignment="3" attributes="0">
+                                                  <Component id="jLabDataCredLiquid" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="jForDataCredLiquidacao" alignment="3" min="-2" max="-2" attributes="0"/>
                                               </Group>
                                           </Group>
                                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -2660,16 +2657,64 @@
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JFormattedTextField" name="jForValorDespCobranca">
+                          <Properties>
+                            <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+                              <Format subtype="0" type="0"/>
+                            </Property>
+                          </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new FormatarValor(FormatarValor.NUMERO)"/>
+                          </AuxValues>
                         </Component>
                         <Component class="javax.swing.JFormattedTextField" name="jForValorAbatConcedido">
+                          <Properties>
+                            <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+                              <Format subtype="0" type="0"/>
+                            </Property>
+                          </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new FormatarValor(FormatarValor.NUMERO)"/>
+                          </AuxValues>
                         </Component>
                         <Component class="javax.swing.JFormattedTextField" name="jForValorDescConcedido">
+                          <Properties>
+                            <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+                              <Format subtype="0" type="0"/>
+                            </Property>
+                          </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new FormatarValor(FormatarValor.NUMERO)"/>
+                          </AuxValues>
                         </Component>
                         <Component class="javax.swing.JFormattedTextField" name="jForValorLiqEmConta">
+                          <Properties>
+                            <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+                              <Format subtype="0" type="0"/>
+                            </Property>
+                          </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new FormatarValor(FormatarValor.NUMERO)"/>
+                          </AuxValues>
                         </Component>
                         <Component class="javax.swing.JFormattedTextField" name="jForValorJurosMoraMulta">
+                          <Properties>
+                            <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+                              <Format subtype="0" type="0"/>
+                            </Property>
+                          </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new FormatarValor(FormatarValor.NUMERO)"/>
+                          </AuxValues>
                         </Component>
                         <Component class="javax.swing.JFormattedTextField" name="jForValorOutrosCred">
+                          <Properties>
+                            <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+                              <Format subtype="0" type="0"/>
+                            </Property>
+                          </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new FormatarValor(FormatarValor.NUMERO)"/>
+                          </AuxValues>
                         </Component>
                         <Component class="javax.swing.JLabel" name="jLabValorIOF">
                           <Properties>
@@ -2680,6 +2725,14 @@
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JFormattedTextField" name="jForValorIOF">
+                          <Properties>
+                            <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+                              <Format subtype="0" type="0"/>
+                            </Property>
+                          </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new FormatarValor(FormatarValor.NUMERO)"/>
+                          </AuxValues>
                         </Component>
                         <Component class="javax.swing.JSeparator" name="jSeparator2">
                           <Properties>
@@ -2862,8 +2915,8 @@
                                                   <Group type="103" groupAlignment="3" attributes="0">
                                                       <Component id="jLabValTituloCobDirEscriturada" alignment="3" min="-2" max="-2" attributes="0"/>
                                                       <Component id="jLabQtdDetalhes" alignment="3" min="-2" max="-2" attributes="0"/>
-                                                      <Component id="jForValTituloCobDirEscriturada" alignment="3" min="-2" max="-2" attributes="0"/>
                                                       <Component id="jTexQtdDetalhes" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="jForValTituloCobDirEscriturada" alignment="3" min="-2" max="-2" attributes="0"/>
                                                   </Group>
                                                   <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
                                                   <Group type="103" groupAlignment="3" attributes="0">
@@ -2993,7 +3046,7 @@
                             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                               <Font name="Tahoma" size="13" style="1"/>
                             </Property>
-                            <Property name="text" type="java.lang.String" value="Vl. Tot, Infor.:"/>
+                            <Property name="text" type="java.lang.String" value="Vl. Tot. Infor.:"/>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JLabel" name="jLabQtdDetalhes">
@@ -3005,19 +3058,57 @@
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JFormattedTextField" name="jForValorTituloCobSimples">
+                          <Properties>
+                            <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+                              <Format subtype="0" type="0"/>
+                            </Property>
+                          </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new FormatarValor(FormatarValor.NUMERO)"/>
+                          </AuxValues>
                         </Component>
                         <Component class="javax.swing.JFormattedTextField" name="jForValorTituloCobVinculada">
-                        </Component>
-                        <Component class="javax.swing.JFormattedTextField" name="jForValTituloCobDirEscriturada">
+                          <Properties>
+                            <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+                              <Format subtype="0" type="0"/>
+                            </Property>
+                          </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new FormatarValor(FormatarValor.NUMERO)"/>
+                          </AuxValues>
                         </Component>
                         <Component class="javax.swing.JFormattedTextField" name="jForValorTotalInformado">
+                          <Properties>
+                            <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+                              <Format subtype="0" type="0"/>
+                            </Property>
+                          </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new FormatarValor(FormatarValor.NUMERO)"/>
+                          </AuxValues>
                         </Component>
                         <Component class="javax.swing.JTextField" name="jTexQtdDetalhes">
+                        </Component>
+                        <Component class="javax.swing.JFormattedTextField" name="jForValTituloCobDirEscriturada">
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new FormatarValor(FormatarValor.NUMERO)&#xd;&#xa;"/>
+                          </AuxValues>
                         </Component>
                       </SubComponents>
                     </Container>
                   </SubComponents>
                 </Container>
+                <Component class="javax.swing.JButton" name="jButton1">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Tahoma" size="13" style="1"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Processar"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+                  </Events>
+                </Component>
               </SubComponents>
             </Container>
           </SubComponents>

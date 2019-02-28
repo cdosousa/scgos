@@ -17,10 +17,13 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 
 /**
  *
@@ -38,6 +41,8 @@ public class CArquivoCNAB {
     private CPosicionarArquivo cpc;
     private static FileReader entrada;
     private Scanner ler;
+    private NumberFormat ftv;
+    private NumberFormat ftq;
 
     /**
      * Variáveis de instância para geração do arquivo
@@ -56,6 +61,8 @@ public class CArquivoCNAB {
     private String[] detalhe;
     private String[] head;
     private String[] trailer;
+    private JTable tabela;
+    private ConsultaModelo cm;
 
     /**
      * Construto padrão
@@ -123,6 +130,12 @@ public class CArquivoCNAB {
     private void setaVariaveisLeitura() throws FileNotFoundException, IOException {
         entrada = new FileReader(pg.getLocalBoletoBanco() + nomeArquivo);
         ler = new Scanner(entrada);
+        ftv.getInstance();
+        ftq.getInstance();
+        ftv = new DecimalFormat("###,###,##0.0000");
+        ftq = new DecimalFormat("###,###,##0.0000");
+        ftq.setMaximumFractionDigits(0);
+        ftv.setMaximumFractionDigits(2);
     }
 
     /**
@@ -158,8 +171,11 @@ public class CArquivoCNAB {
         return 0;
     }
 
-    public int lerArquivo() {
+    public int lerArquivo(JTable tabela) {
+        this.tabela = tabela;
+        int interacao = 1;
         try {
+            cm = new ConsultaModelo(conexao);
             do {
                 registro = ler.nextLine();
                 cnab.setCdTipoRegistro(registro.substring(0, 1));
@@ -168,7 +184,9 @@ public class CArquivoCNAB {
                         return 0;
                     }
                 } else if ("1".equals(cnab.getCdTipoRegistro())) {
-                    if (lerDetalheItau() == 0) {
+                    if (lerDetalheItau() == 1) {
+                        carregarTabelaDetalhe(interacao);
+                    } else {
                         return 0;
                     }
                 } else if ("9".equals(cnab.getCdTipoRegistro())) {
@@ -176,7 +194,7 @@ public class CArquivoCNAB {
                         return 0;
                     }
                 }
-
+                interacao++;
             } while (!"9".equals(cnab.getCdTipoRegistro()));
             return 1;
         } catch (Exception e) {
@@ -213,6 +231,7 @@ public class CArquivoCNAB {
         int[] tamanho = {1, 1, 7, 2, 15, 4, 2, 5, 1, 8, 30, 3, 15, 6, 5, 3, 5, 6, 275, 6};
         head = lerRegistroDoArquivo(tamanho);
         if (head.length == tamanho.length) {
+            cnab.setHead(head);
             return 1;
         } else {
             mensagem("Erro na leitura do cabecalho arquivo!");
@@ -296,6 +315,7 @@ public class CArquivoCNAB {
             1, 2, 6, 4, 6, 13, 30, 23, 8, 7, 2, 6};
         detalhe = lerRegistroDoArquivo(tamanho);
         if (detalhe.length == tamanho.length) {
+            cnab.setDetalhe(detalhe);
             return 1;
         } else {
             mensagem("Erro na leitura do detalhe do arquivo!");
@@ -346,6 +366,15 @@ public class CArquivoCNAB {
         int[] tamanho = {1, 1, 2, 3, 10, 8, 14, 8, 10, 8, 14, 8, 90, 8, 14, 8, 5, 8, 14, 160, 6};
         trailer = lerRegistroDoArquivo(tamanho);
         if (trailer.length == tamanho.length) {
+            trailer[5] = String.format("%s", ftq.format(Integer.valueOf(trailer[5])));
+            trailer[6] = String.format("%s", Double.valueOf(String.format("%s%s%s", trailer[6].substring(0, 12), ".", trailer[6].substring(12, 14))));
+            trailer[9] = String.format("%s", ftq.format(Integer.valueOf(trailer[9])));
+            trailer[10] = String.format("%s", Double.valueOf(String.format("%s%s%s", trailer[10].substring(0, 12), ".", trailer[10].substring(12, 14))));
+            trailer[13] = String.format("%s", ftq.format(Integer.valueOf(trailer[13])));
+            trailer[14] = String.format("%s", Double.valueOf(String.format("%s%s%s", trailer[14].substring(0, 12), ".", trailer[14].substring(12, 14))));
+            trailer[17] = String.format("%s", ftq.format(Integer.valueOf(trailer[17])));
+            trailer[18] = String.format("%s", Double.valueOf(String.format("%s%s%s", trailer[18].substring(0, 12), ".", trailer[18].substring(12, 14))));
+            cnab.setTrailer(trailer);
             return 1;
         } else {
             mensagem("Erro na leitura do trailer do arquivo!");
@@ -365,7 +394,7 @@ public class CArquivoCNAB {
         String[] campos = new String[tamanho.length];
         for (int i = 0; i < tamanho.length; i++) {
             campos[campo] = registro.substring(posicao, tamanho[i] + posicao);
-            mensagem("\nInteracao: " + campo + "\nPosicao: " + (posicao + 1) + "\nTamanho: " + tamanho[i] + "\nConteudo: " + campos[campo]);
+            //         mensagem("\nInteracao: " + campo + "\nPosicao: " + (posicao + 1) + "\nTamanho: " + tamanho[i] + "\nConteudo: " + campos[campo]);
             posicao += tamanho[i];
             campo++;
         }
@@ -486,6 +515,21 @@ public class CArquivoCNAB {
         detail[1] = cnab.getCdMulta();
         detail[2] = cnab.getDataVencimento();
         detail[4] = " ";
+    }
+
+    private void carregarTabelaDetalhe(int interacao) throws SQLException {
+        String[] detalhe = new String[10];
+        detalhe[0] = this.detalhe[9];
+        detalhe[1] = this.detalhe[13];
+        detalhe[2] = this.detalhe[11];
+        detalhe[3] = this.detalhe[15];
+        detalhe[4] = this.detalhe[17];
+        detalhe[5] = this.detalhe[18];
+        detalhe[6] = this.detalhe[8].trim();
+        detalhe[7] = this.detalhe[19];
+        detalhe[8] = String.format("%s%s%s%s%s", this.detalhe[21].substring(0, 2), "/", this.detalhe[21].substring(2, 4), "/20", this.detalhe[21].substring(4, 6));
+        detalhe[9] = String.format("%s", ftv.format(Double.valueOf(String.format("%s%s%s", this.detalhe[22].substring(0, 11), ".", this.detalhe[22].substring(11, 13)))));
+        tabela.setModel(cm.carregarConteudoTabela(tabela, detalhe, interacao));
     }
 
     /**

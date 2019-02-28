@@ -109,6 +109,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private String peridoLiquDe;
     private String peridoLiquAte;
     private String operAgendamento;
+    private String nomeArquivoRetorno;
 
     /**
      * Creates new form ManterPreparacaoPagamento
@@ -616,8 +617,10 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
 
     private void lerArquivoCNAB() throws IOException {
         cnab = new ArquivoCNAB();
-        ccnab = new CArquivoCNAB(cnab, pg, conexao, "CN19029A.RET");
-        ccnab.lerArquivo();
+        ccnab = new CArquivoCNAB(cnab, pg, conexao, nomeArquivoRetorno);
+        ccnab.lerArquivo(jTabDetalheCNAB);
+        atualizarHead();
+        atualizarTrailer();
     }
 
     /**
@@ -630,13 +633,45 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             File arq = fc.getSelectedFile();
             try {
                 jTexArquivoRetorno.setText(arq.getCanonicalPath());
-                mensagemTela("getCanonicalPath: " + arq.getCanonicalPath() + "\ngetAbsolutePath: " + arq.getAbsolutePath()
-                        + "\ngetName: " + arq.getName() + "\ngetParent: " + arq.getParent() + "\ngetPath: " + arq.getPath()
-                        + "\ngetAbsoluteFile: " + arq.getAbsoluteFile() + "\ngetCanonicalFile: " + arq.getCanonicalFile());
+                nomeArquivoRetorno = arq.getName();
             } catch (IOException ex) {
                 Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+    
+    /**
+     * Método para atualizar os campos do registro head na tela
+     */
+    private void atualizarHead(){
+        String[] head = cnab.getHead();
+        jTexCdMovimento.setText(head[1]);
+        jTexNomeMovimento.setText(head[2]);
+        jTexCdTipoServico.setText(head[3]);
+        jTexNomeTipoServico.setText(head[4]);
+        jForDataArquivo.setText(String.format("%s%s%s%s%s", head[13].substring(0, 2),"/",head[13].substring(2, 4),"/20",head[13].substring(4, 6)));
+        jTexNomeEmpresa.setText(head[10]);
+        jTexCdBanco.setText(head[11]);
+        jTexNomeBanco.setText(head[12]);
+        jTexCdAgencia.setText(head[5]);
+        jTexCdConta.setText(head[7]);
+        jTexCdDigConta.setText(head[8]);
+        jForDataCreditoArquivo.setText(String.format("%s%s%s%s%s", head[17].substring(0, 2),"/",head[17].substring(2, 4),"/20",head[17].substring(4, 6)));
+    }
+    
+    private void atualizarTrailer(){
+        String[] trailer = cnab.getTrailer();
+        jTexQtdTitulosCobSimples.setText(trailer[5]);
+        jForValorTituloCobSimples.setText(trailer[6]);
+        jTexAvisoBcoCobSimples.setText(trailer[7]);
+        jTexQtdTituloCobVinculada.setText(trailer[9]);
+        jForValorTituloCobVinculada.setText(trailer[10]);
+        jTexAvisoBcoCobVinculada.setText(trailer[11]);
+        jTexQtdTituloCobDirEscriturada.setText(trailer[13]);
+        jForValTituloCobDirEscriturada.setText(trailer[14]);
+        jTexAvisoBcoCobDirEscriturada.setText(trailer[15]);
+        jTexQtdDetalhes.setText(trailer[17]);
+        jForValorTotalInformado.setText(trailer[18]);
     }
 
     /**
@@ -772,8 +807,8 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jTexCdConta = new javax.swing.JTextField();
         jLabContaDigito = new javax.swing.JLabel();
         jTexCdDigConta = new javax.swing.JTextField();
-        jLabel9 = new javax.swing.JLabel();
-        jFormattedTextField1 = new javax.swing.JFormattedTextField();
+        jLabDataCreditoArquivo = new javax.swing.JLabel();
+        jForDataCreditoArquivo = new javax.swing.JFormattedTextField();
         jLabContaDigito1 = new javax.swing.JLabel();
         jScrollPane6 = new javax.swing.JScrollPane();
         jTabDetalheCNAB = new javax.swing.JTable();
@@ -784,14 +819,14 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jLabValorLiqEmConta = new javax.swing.JLabel();
         jLabValorJurosMoraMulta = new javax.swing.JLabel();
         jLabValorOutrosCred = new javax.swing.JLabel();
-        jForValorDespCobranca = new javax.swing.JFormattedTextField();
-        jForValorAbatConcedido = new javax.swing.JFormattedTextField();
-        jForValorDescConcedido = new javax.swing.JFormattedTextField();
-        jForValorLiqEmConta = new javax.swing.JFormattedTextField();
-        jForValorJurosMoraMulta = new javax.swing.JFormattedTextField();
-        jForValorOutrosCred = new javax.swing.JFormattedTextField();
+        jForValorDespCobranca = new FormatarValor(FormatarValor.NUMERO);
+        jForValorAbatConcedido = new FormatarValor(FormatarValor.NUMERO);
+        jForValorDescConcedido = new FormatarValor(FormatarValor.NUMERO);
+        jForValorLiqEmConta = new FormatarValor(FormatarValor.NUMERO);
+        jForValorJurosMoraMulta = new FormatarValor(FormatarValor.NUMERO);
+        jForValorOutrosCred = new FormatarValor(FormatarValor.NUMERO);
         jLabValorIOF = new javax.swing.JLabel();
-        jForValorIOF = new javax.swing.JFormattedTextField();
+        jForValorIOF = new FormatarValor(FormatarValor.NUMERO);
         jSeparator2 = new javax.swing.JSeparator();
         jLabCdOcorrencia = new javax.swing.JLabel();
         jLabCdIntrCancel = new javax.swing.JLabel();
@@ -829,11 +864,13 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jTexAvisoBcoCobDirEscriturada = new javax.swing.JTextField();
         jLabValorTotalInformado = new javax.swing.JLabel();
         jLabQtdDetalhes = new javax.swing.JLabel();
-        jForValorTituloCobSimples = new javax.swing.JFormattedTextField();
-        jForValorTituloCobVinculada = new javax.swing.JFormattedTextField();
-        jForValTituloCobDirEscriturada = new javax.swing.JFormattedTextField();
-        jForValorTotalInformado = new javax.swing.JFormattedTextField();
+        jForValorTituloCobSimples = new FormatarValor(FormatarValor.NUMERO);
+        jForValorTituloCobVinculada = new FormatarValor(FormatarValor.NUMERO);
+        jForValorTotalInformado = new FormatarValor(FormatarValor.NUMERO);
         jTexQtdDetalhes = new javax.swing.JTextField();
+        jForValTituloCobDirEscriturada = new FormatarValor(FormatarValor.NUMERO)
+        ;
+        jButton1 = new javax.swing.JButton();
         jMenuBar = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -2042,11 +2079,11 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jLabContaDigito.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabContaDigito.setText("-");
 
-        jLabel9.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        jLabel9.setText("Data Crédito:");
+        jLabDataCreditoArquivo.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabDataCreditoArquivo.setText("Data Crédito:");
 
         try {
-            jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##/##/####")));
+            jForDataCreditoArquivo.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##/##/####")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
@@ -2056,26 +2093,26 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
 
         jTabDetalheCNAB.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Selec.", "Nosso Num.", "DAC", "Carteira", "Cod.Cart.", "Dt.Ocorr.", "Doc", "Esp.Doc", "Num.Banco", "Dt.Vencimento", "Valor Titulo"
+                "Nosso Num.", "DAC", "Carteira", "Cod.Cart.", "Dt.Ocorr.", "Doc", "Esp.Doc", "Num.Banco", "Dt.Vencimento", "Valor Titulo"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Boolean.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -2089,27 +2126,25 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jScrollPane6.setViewportView(jTabDetalheCNAB);
         if (jTabDetalheCNAB.getColumnModel().getColumnCount() > 0) {
             jTabDetalheCNAB.getColumnModel().getColumn(0).setResizable(false);
-            jTabDetalheCNAB.getColumnModel().getColumn(0).setPreferredWidth(10);
+            jTabDetalheCNAB.getColumnModel().getColumn(0).setPreferredWidth(30);
             jTabDetalheCNAB.getColumnModel().getColumn(1).setResizable(false);
-            jTabDetalheCNAB.getColumnModel().getColumn(1).setPreferredWidth(30);
+            jTabDetalheCNAB.getColumnModel().getColumn(1).setPreferredWidth(10);
             jTabDetalheCNAB.getColumnModel().getColumn(2).setResizable(false);
             jTabDetalheCNAB.getColumnModel().getColumn(2).setPreferredWidth(10);
             jTabDetalheCNAB.getColumnModel().getColumn(3).setResizable(false);
             jTabDetalheCNAB.getColumnModel().getColumn(3).setPreferredWidth(10);
             jTabDetalheCNAB.getColumnModel().getColumn(4).setResizable(false);
-            jTabDetalheCNAB.getColumnModel().getColumn(4).setPreferredWidth(10);
+            jTabDetalheCNAB.getColumnModel().getColumn(4).setPreferredWidth(30);
             jTabDetalheCNAB.getColumnModel().getColumn(5).setResizable(false);
             jTabDetalheCNAB.getColumnModel().getColumn(5).setPreferredWidth(30);
             jTabDetalheCNAB.getColumnModel().getColumn(6).setResizable(false);
-            jTabDetalheCNAB.getColumnModel().getColumn(6).setPreferredWidth(30);
+            jTabDetalheCNAB.getColumnModel().getColumn(6).setPreferredWidth(20);
             jTabDetalheCNAB.getColumnModel().getColumn(7).setResizable(false);
-            jTabDetalheCNAB.getColumnModel().getColumn(7).setPreferredWidth(20);
+            jTabDetalheCNAB.getColumnModel().getColumn(7).setPreferredWidth(30);
             jTabDetalheCNAB.getColumnModel().getColumn(8).setResizable(false);
             jTabDetalheCNAB.getColumnModel().getColumn(8).setPreferredWidth(30);
             jTabDetalheCNAB.getColumnModel().getColumn(9).setResizable(false);
-            jTabDetalheCNAB.getColumnModel().getColumn(9).setPreferredWidth(30);
-            jTabDetalheCNAB.getColumnModel().getColumn(10).setResizable(false);
-            jTabDetalheCNAB.getColumnModel().getColumn(10).setPreferredWidth(60);
+            jTabDetalheCNAB.getColumnModel().getColumn(9).setPreferredWidth(60);
         }
 
         jPanDetalheArquivo.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Registro Detalhe:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 13))); // NOI18N
@@ -2132,8 +2167,22 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jLabValorOutrosCred.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabValorOutrosCred.setText("Outros Créditos (R$):");
 
+        jForValorDespCobranca.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+
+        jForValorAbatConcedido.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+
+        jForValorDescConcedido.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+
+        jForValorLiqEmConta.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+
+        jForValorJurosMoraMulta.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+
+        jForValorOutrosCred.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+
         jLabValorIOF.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabValorIOF.setText("IOF (R$):");
+
+        jForValorIOF.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
 
         jSeparator2.setBorder(javax.swing.BorderFactory.createEtchedBorder(java.awt.Color.gray, null));
 
@@ -2286,12 +2335,13 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                             .addComponent(jTexCdLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jTexNomeLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(2, 2, 2)
-                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabDataCredLiquid)
-                            .addComponent(jForDataCredLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(jLabSeqRegistro)
-                                .addComponent(jTexSeqRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(jTexSeqRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabDataCredLiquid)
+                                .addComponent(jForDataCredLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
 
@@ -2325,10 +2375,16 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jLabAvisoBcoCobDirEscriturada.setText("Ref.aviso Bco:");
 
         jLabValorTotalInformado.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        jLabValorTotalInformado.setText("Vl. Tot, Infor.:");
+        jLabValorTotalInformado.setText("Vl. Tot. Infor.:");
 
         jLabQtdDetalhes.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabQtdDetalhes.setText("Qt. detalhes:");
+
+        jForValorTituloCobSimples.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+
+        jForValorTituloCobVinculada.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+
+        jForValorTotalInformado.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
@@ -2395,8 +2451,8 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(jLabValTituloCobDirEscriturada)
                                     .addComponent(jLabQtdDetalhes)
-                                    .addComponent(jForValTituloCobDirEscriturada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jTexQtdDetalhes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jTexQtdDetalhes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jForValTituloCobDirEscriturada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(2, 2, 2)
                                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(jLabAvisoBcoCobDirEscriturada)
@@ -2470,9 +2526,9 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(jTexCdDigConta, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGap(18, 18, 18)
-                            .addComponent(jLabel9)
+                            .addComponent(jLabDataCreditoArquivo)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jForDataCreditoArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(jPanDetalheArquivo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -2504,8 +2560,8 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                     .addComponent(jTexCdConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabContaDigito)
                     .addComponent(jTexCdDigConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9)
-                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabDataCreditoArquivo)
+                    .addComponent(jForDataCreditoArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabContaDigito1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -2515,6 +2571,14 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                 .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jButton1.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jButton1.setText("Processar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
@@ -2522,16 +2586,17 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addComponent(jPanRetornoDeArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())
+                    .addComponent(jPanRetornoDeArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addComponent(jLabArquivoRetorno)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTexArquivoRetorno, javax.swing.GroupLayout.PREFERRED_SIZE, 608, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButArquivo)
-                        .addGap(387, 517, Short.MAX_VALUE))))
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton1)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2540,7 +2605,8 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabArquivoRetorno)
                     .addComponent(jTexArquivoRetorno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButArquivo))
+                    .addComponent(jButArquivo)
+                    .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanRetornoDeArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -2810,6 +2876,14 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         buscarArquivoCNAB();
     }//GEN-LAST:event_jButArquivoActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        try {
+            lerArquivoCNAB();
+        } catch (IOException ex) {
+            Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -2866,6 +2940,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JButton jButSalvar;
     private javax.swing.JButton jButSalvarPreparacao;
     private javax.swing.JButton jButSelecionarMarcados;
+    private javax.swing.JButton jButton1;
     private javax.swing.JComboBox<String> jComPagarReceber;
     private javax.swing.JComboBox<String> jComSituacao;
     private javax.swing.JComboBox<String> jComTipoLancamento;
@@ -2875,6 +2950,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JFormattedTextField jForDatVencimentoIni;
     private javax.swing.JFormattedTextField jForDataArquivo;
     private javax.swing.JFormattedTextField jForDataCredLiquidacao;
+    private javax.swing.JFormattedTextField jForDataCreditoArquivo;
     private javax.swing.JFormattedTextField jForDataLiquidacaoAte;
     private javax.swing.JFormattedTextField jForDataLiquidacaoDe;
     private javax.swing.JFormattedTextField jForEmissaoTitulo;
@@ -2894,7 +2970,6 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JFormattedTextField jForValorTituloCobSimples;
     private javax.swing.JFormattedTextField jForValorTituloCobVinculada;
     private javax.swing.JFormattedTextField jForValorTotalInformado;
-    private javax.swing.JFormattedTextField jFormattedTextField1;
     private javax.swing.JLabel jLabAgenciaConta;
     private javax.swing.JLabel jLabArquivoRetorno;
     private javax.swing.JLabel jLabAvisoBcoCobDirEscriturada;
@@ -2910,6 +2985,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JLabel jLabContaDigito1;
     private javax.swing.JLabel jLabDataArquivo;
     private javax.swing.JLabel jLabDataCredLiquid;
+    private javax.swing.JLabel jLabDataCreditoArquivo;
     private javax.swing.JLabel jLabDataEmissao;
     private javax.swing.JLabel jLabDataLiquidacao;
     private javax.swing.JLabel jLabDocumento;
@@ -2949,7 +3025,6 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar;

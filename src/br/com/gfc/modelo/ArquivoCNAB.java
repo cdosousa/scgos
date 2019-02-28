@@ -23,6 +23,7 @@ public class ArquivoCNAB extends ParametrosEDI {
     private String tipoPessoaEmpresa;
     private String cpfCnpjEmpresa;
     private String horaGeracao;
+    private String[] head;
 
     /**
      * Variáveis para informaões do Registro 1 (Detalhe) de remessa
@@ -68,7 +69,7 @@ public class ArquivoCNAB extends ParametrosEDI {
     private String cdFormaCadTitBanco;
     private String cdCodigoProtesto;
     private String cdMoeda;
-    
+
     /**
      * Variáveis do registro 1 (detalhes) retorno
      */
@@ -80,7 +81,79 @@ public class ArquivoCNAB extends ParametrosEDI {
     private String cdInstrucaoCancelada;
     private String mensagemErrosInfor;
     private String cdLiquidacao;
+    private String[] detalhe;
+    
+    /**
+     * Variáveis do registro 9 (trailer) retorno
+     */
+    private String[] trailer;
+    
+    /**
+     * Construtor padrão da classe
+     */
+    public ArquivoCNAB(){
+        
+    }
 
+    public ArquivoCNAB(String cdLoteDetalhe, String cdSegmentoRegistro, String cdMovimentoRemessa, String cdModalidadeCarteiraSincon, String cdModalidadeCarteiraSigcb, String cdInstrucaoAlegacao,
+            String nossoNumero, String qtdeMoedaVariavel, String cdOcorrencia, String numeroDocumento, String dataVencimento, String valorTitulo, String cdAgenciaCobradora,
+            String digVerifAgenciaCobradoa, String cdEspecieTitulo, String cdAceite, String dataEmissao, String cdInstrucao1, String cdInstrucao2, String jurosDe1Dia, String dataLimiteDesconto, 
+            String valorDesconto, String valorIof, String valorAbatimento, String tipoPessoaCliente, String cpfCnpjCliente, String nomeCliente, String enderecoCliente, String bairroCliente, 
+            String cepCliente, String cidadeCliente, String estadoCliente, String sacadorAvalista, String dataMora, String prazoDias, String cdMulta, String dataMulta, String valorMulta, 
+            String cdFormaCadTitBanco, String cdCodigoProtesto, String cdMoeda, String valorTarifaCobranca, String valorPrincipal, String valorOutrosCreditos, String cdBoletoDDA, 
+            String dataCredito, String cdInstrucaoCancelada, String mensagemErrosInfor, String cdLiquidacao, String[] detalhe) {
+        this.cdLoteDetalhe = cdLoteDetalhe;
+        this.cdSegmentoRegistro = cdSegmentoRegistro;
+        this.cdMovimentoRemessa = cdMovimentoRemessa;
+        this.cdModalidadeCarteiraSincon = cdModalidadeCarteiraSincon;
+        this.cdModalidadeCarteiraSigcb = cdModalidadeCarteiraSigcb;
+        this.cdInstrucaoAlegacao = cdInstrucaoAlegacao;
+        this.nossoNumero = nossoNumero;
+        this.qtdeMoedaVariavel = qtdeMoedaVariavel;
+        this.cdOcorrencia = cdOcorrencia;
+        this.numeroDocumento = numeroDocumento;
+        this.dataVencimento = dataVencimento;
+        this.valorTitulo = valorTitulo;
+        this.cdAgenciaCobradora = cdAgenciaCobradora;
+        this.digVerifAgenciaCobradoa = digVerifAgenciaCobradoa;
+        this.cdEspecieTitulo = cdEspecieTitulo;
+        this.cdAceite = cdAceite;
+        this.dataEmissao = dataEmissao;
+        this.cdInstrucao1 = cdInstrucao1;
+        this.cdInstrucao2 = cdInstrucao2;
+        this.jurosDe1Dia = jurosDe1Dia;
+        this.dataLimiteDesconto = dataLimiteDesconto;
+        this.valorDesconto = valorDesconto;
+        this.valorIof = valorIof;
+        this.valorAbatimento = valorAbatimento;
+        this.tipoPessoaCliente = tipoPessoaCliente;
+        this.cpfCnpjCliente = cpfCnpjCliente;
+        this.nomeCliente = nomeCliente;
+        this.enderecoCliente = enderecoCliente;
+        this.bairroCliente = bairroCliente;
+        this.cepCliente = cepCliente;
+        this.cidadeCliente = cidadeCliente;
+        this.estadoCliente = estadoCliente;
+        this.sacadorAvalista = sacadorAvalista;
+        this.dataMora = dataMora;
+        this.prazoDias = prazoDias;
+        this.cdMulta = cdMulta;
+        this.dataMulta = dataMulta;
+        this.valorMulta = valorMulta;
+        this.cdFormaCadTitBanco = cdFormaCadTitBanco;
+        this.cdCodigoProtesto = cdCodigoProtesto;
+        this.cdMoeda = cdMoeda;
+        this.valorTarifaCobranca = valorTarifaCobranca;
+        this.valorPrincipal = valorPrincipal;
+        this.valorOutrosCreditos = valorOutrosCreditos;
+        this.cdBoletoDDA = cdBoletoDDA;
+        this.dataCredito = dataCredito;
+        this.cdInstrucaoCancelada = cdInstrucaoCancelada;
+        this.mensagemErrosInfor = mensagemErrosInfor;
+        this.cdLiquidacao = cdLiquidacao;
+        this.detalhe = detalhe;
+    }
+    
     /**
      * @return the cdTipoRegistro
      */
@@ -891,5 +964,47 @@ public class ArquivoCNAB extends ParametrosEDI {
      */
     public void setCdLiquidacao(String cdLiquidacao) {
         this.cdLiquidacao = cdLiquidacao;
+    }
+
+    /**
+     * @return the head
+     */
+    public String[] getHead() {
+        return head;
+    }
+
+    /**
+     * @param head the head to set
+     */
+    public void setHead(String[] head) {
+        this.head = head;
+    }
+
+    /**
+     * @return the detalhe
+     */
+    public String[] getDetalhe() {
+        return detalhe;
+    }
+
+    /**
+     * @param detalhe the detalhe to set
+     */
+    public void setDetalhe(String[] detalhe) {
+        this.detalhe = detalhe;
+    }
+
+    /**
+     * @return the trailer
+     */
+    public String[] getTrailer() {
+        return trailer;
+    }
+
+    /**
+     * @param trailer the trailer to set
+     */
+    public void setTrailer(String[] trailer) {
+        this.trailer = trailer;
     }
 }
