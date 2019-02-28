@@ -73,6 +73,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private Lancamentos modlan;
     private ArquivoCNAB cnab;
     private CArquivoCNAB ccnab;
+    private ArquivoCNAB cb;
 
     /**
      * variáveis de instância da classe
@@ -99,9 +100,11 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private int linhaTitulos;
     private int linhaPagamAgend;
     private int linhaTitAgend;
+    private int linhaDetalheCNAB;
     private boolean moverLinha = true;
     private boolean botaoMarcarDesmarcar = false;
     private boolean marcarLinha = false;
+    private boolean buscaCNAB = false;
     private boolean[] intervaloTit;
     private int contIntervTit = 0;
     private int[] linhaSelecTitulo;
@@ -365,6 +368,22 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             }
         });
 
+        //Adiciona listener para a tabela de detalhes do cnab
+        jTabDetalheCNAB.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                try {
+                    if (jTabbPrincipal.getSelectedIndex() == 2 && buscaCNAB && jTabDetalheCNAB.getRowCount() > 0) {
+                        linhaDetalheCNAB = jTabDetalheCNAB.getSelectedRow();
+                        limparDetalheTelaCNAB();
+                        atualizarDetail();
+                    }
+                } catch (Exception ex) {
+                    mensagemTela("Erro na busca dos registros correlados da tabela de detalhe do arquivo CNAB!\nErro: " + ex);
+                }
+            }
+        });
+
     }
 
     /**
@@ -382,6 +401,13 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                 new Class[]{String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, Double.class, String.class,
                     String.class, Double.class, Double.class, String.class},
                 new boolean[]{false, false, false, false, false, false, false, false, false, false, false, false, false, false});
+    }
+
+    private void zerarTabelaDetalheCNAB() {
+        ccnab.zerarTabela(new Object[]{null, null, null, null, null, null, null, null, null, null},
+                new String[]{"Nosso Num.", "DAC", "Carteira", "Cod.Cart.", "Dt.Ocorr.", "Doc", "Esp.Doc", "Num.Banco", "Dt.Vencimento", "Valor Titulo"},
+                new Class[]{String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, Double.class},
+                new boolean[]{false, false, false, false, false, false, false, false, false, false});
     }
 
     /**
@@ -572,6 +598,59 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     }
 
     /**
+     * Método para limpar os campos de head e trailer da tala de CNAB
+     */
+    private void limparHeadTrailerTelaCNAB() {
+        //registro de head
+        jTexCdMovimento.setText("");
+        jTexNomeMovimento.setText("");
+        jTexCdTipoServico.setText("");
+        jTexNomeTipoServico.setText("");
+        jForDataArquivo.setText("");
+        jTexNomeEmpresa.setText("");
+        jTexCdBanco.setText("");
+        jTexNomeBanco.setText("");
+        jTexCdAgencia.setText("");
+        jTexCdConta.setText("");
+        jTexCdDigConta.setText("");
+        jForDataCreditoArquivo.setText("");
+
+        //registro do trailer
+        jTexQtdTitulosCobSimples.setText("0");
+        jForValorTituloCobSimples.setText("0.00");
+        jTexAvisoBcoCobSimples.setText("");
+        jTexQtdTituloCobVinculada.setText("0");
+        jForValorTituloCobVinculada.setText("0.00");
+        jTexAvisoBcoCobVinculada.setText("");
+        jTexQtdTituloCobDirEscriturada.setText("0");
+        jForValTituloCobDirEscriturada.setText("0.00");
+        jTexAvisoBcoCobDirEscriturada.setText("");
+        jTexQtdDetalhes.setText("0");
+        jForValorTotalInformado.setText("0.00");
+    }
+
+    /**
+     * Metodo para limpar tela do arquivo CNAB
+     */
+    private void limparDetalheTelaCNAB() {
+        //registro do detail
+        jForValorDespCobranca.setText("0.00");
+        jForValorAbatConcedido.setText("0.00");
+        jForValorDescConcedido.setText("0.00");
+        jForValorLiqEmConta.setText("0.00");
+        jForValorJurosMoraMulta.setText("0.00");
+        jForValorOutrosCred.setText("0.00");
+        jForValorIOF.setText("0.00");
+        jTexCdOcorrencia.setText("");
+        jTexCdIntrCancelamento.setText("");
+        jTexPagador.setText("");
+        jTexCdErroMensInformacao.setText("");
+        jTexCdLiquidacao.setText("");
+        jForDataCredLiquidacao.setText("");
+        jTexSeqRegistro.setText("");
+    }
+
+    /**
      * Método criado para gerar a liquidação do título
      */
     private void liquidarTitulo() {
@@ -618,7 +697,9 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private void lerArquivoCNAB() throws IOException {
         cnab = new ArquivoCNAB();
         ccnab = new CArquivoCNAB(cnab, pg, conexao, nomeArquivoRetorno);
+        buscaCNAB = true;
         ccnab.lerArquivo(jTabDetalheCNAB);
+        atualizarDetail();
         atualizarHead();
         atualizarTrailer();
     }
@@ -627,6 +708,13 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
      * Método para buscar o aquivo de retorno do banco
      */
     private void buscarArquivoCNAB() {
+        limparHeadTrailerTelaCNAB();
+        limparDetalheTelaCNAB();
+        linhaDetalheCNAB = 0;
+        if (buscaCNAB) {
+            zerarTabelaDetalheCNAB();
+        }
+        buscaCNAB = false;
         JFileChooser fc = new JFileChooser();
         int option = fc.showOpenDialog(jPanel6);
         if (option == fc.APPROVE_OPTION) {
@@ -639,27 +727,51 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             }
         }
     }
-    
+
     /**
      * Método para atualizar os campos do registro head na tela
      */
-    private void atualizarHead(){
+    private void atualizarHead() {
         String[] head = cnab.getHead();
         jTexCdMovimento.setText(head[1]);
         jTexNomeMovimento.setText(head[2]);
         jTexCdTipoServico.setText(head[3]);
         jTexNomeTipoServico.setText(head[4]);
-        jForDataArquivo.setText(String.format("%s%s%s%s%s", head[13].substring(0, 2),"/",head[13].substring(2, 4),"/20",head[13].substring(4, 6)));
+        jForDataArquivo.setText(String.format("%s%s%s%s%s", head[13].substring(0, 2), "/", head[13].substring(2, 4), "/20", head[13].substring(4, 6)));
         jTexNomeEmpresa.setText(head[10]);
         jTexCdBanco.setText(head[11]);
         jTexNomeBanco.setText(head[12]);
         jTexCdAgencia.setText(head[5]);
         jTexCdConta.setText(head[7]);
         jTexCdDigConta.setText(head[8]);
-        jForDataCreditoArquivo.setText(String.format("%s%s%s%s%s", head[17].substring(0, 2),"/",head[17].substring(2, 4),"/20",head[17].substring(4, 6)));
+        jForDataCreditoArquivo.setText(String.format("%s%s%s%s%s", head[17].substring(0, 2), "/", head[17].substring(2, 4), "/20", head[17].substring(4, 6)));
     }
-    
-    private void atualizarTrailer(){
+
+    /**
+     * Método para atualizar os campos do registro detalhe na tela
+     */
+    private void atualizarDetail() {
+        cb = ccnab.selecionarRegistroDetalhe(linhaDetalheCNAB);
+        jForValorDespCobranca.setText(cb.getValorTarifaCobranca());
+        jForValorAbatConcedido.setText(cb.getValorAbatimento());
+        jForValorDescConcedido.setText(cb.getValorDesconto());
+        jForValorLiqEmConta.setText(cb.getValorPrincipal());
+        jForValorJurosMoraMulta.setText(cb.getValorMulta());
+        jForValorOutrosCred.setText(cb.getValorOutrosCreditos());
+        jForValorIOF.setText(cb.getValorIof());
+        jTexCdOcorrencia.setText(cb.getCdOcorrencia());
+        jTexCdIntrCancelamento.setText(cb.getCdInstrucaoCancelada());
+        jTexPagador.setText(cb.getNomeCliente());
+        jTexCdErroMensInformacao.setText(cb.getMensagemErrosInfor());
+        jTexCdLiquidacao.setText(cb.getCdLiquidacao());
+        jForDataCredLiquidacao.setText(cb.getDataCredito());
+        jTexSeqRegistro.setText(cb.getSequencialRegistro());
+    }
+
+    /**
+     * Método para atualuzar os campos do registro trailer na tela
+     */
+    private void atualizarTrailer() {
         String[] trailer = cnab.getTrailer();
         jTexQtdTitulosCobSimples.setText(trailer[5]);
         jForValorTituloCobSimples.setText(trailer[6]);
@@ -703,7 +815,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jButProximo = new javax.swing.JButton();
         jButSair = new javax.swing.JButton();
         jPanGeral = new javax.swing.JPanel();
-        jTabbedPane = new javax.swing.JTabbedPane();
+        jTabbPrincipal = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
         jPanTotaisTitulos = new javax.swing.JPanel();
         jLabTotTitReceber = new javax.swing.JLabel();
@@ -968,7 +1080,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
 
         jPanGeral.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jTabbedPane.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jTabbPrincipal.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
 
         jPanel2.setMaximumSize(new java.awt.Dimension(1321, 634));
 
@@ -1426,7 +1538,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jTabbedPane.addTab("Preparação", jPanel2);
+        jTabbPrincipal.addTab("Preparação", jPanel2);
 
         jPanSelecionados.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Títulos Selecionados", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 13))); // NOI18N
 
@@ -2031,7 +2143,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jTabbedPane.addTab("Preparados", jPanel3);
+        jTabbPrincipal.addTab("Preparados", jPanel3);
 
         jLabArquivoRetorno.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabArquivoRetorno.setText("Arquivo retorno:");
@@ -2612,7 +2724,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jTabbedPane.addTab("CNAB", jPanel6);
+        jTabbPrincipal.addTab("CNAB", jPanel6);
 
         javax.swing.GroupLayout jPanGeralLayout = new javax.swing.GroupLayout(jPanGeral);
         jPanGeral.setLayout(jPanGeralLayout);
@@ -2620,14 +2732,14 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             jPanGeralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanGeralLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTabbPrincipal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanGeralLayout.setVerticalGroup(
             jPanGeralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanGeralLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 663, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTabbPrincipal, javax.swing.GroupLayout.PREFERRED_SIZE, 663, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -2703,7 +2815,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             selecionarTitulosMarcados();
             ctTitulos.alinharTabela(jTabTituloSelecionados, 9, 12, 13);
             ctTitulos.ajustarTabela(jTabTituloSelecionados, 5, 30, 5, 5, 5, 30, 200, 20, 5, 20, 30, 30, 20, 20, 20);
-            jTabbedPane.setSelectedIndex(1);
+            jTabbPrincipal.setSelectedIndex(1);
             jForQtdeTitulos.setText(String.valueOf(contIntervTit));
             jForValTotTitulos.setText(String.valueOf(valTotalSelec));
             jTexCdInfoPortador.setText(String.format("%s", jTabPortadores.getValueAt(linhaPortadores, 1)));
@@ -3065,7 +3177,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JTable jTabTitulo;
     private javax.swing.JTable jTabTituloSelecionados;
     private javax.swing.JTable jTabTitulosAgendados;
-    private javax.swing.JTabbedPane jTabbedPane;
+    private javax.swing.JTabbedPane jTabbPrincipal;
     private javax.swing.JTextField jTexArquivoRetorno;
     private javax.swing.JTextField jTexAvisoBcoCobDirEscriturada;
     private javax.swing.JTextField jTexAvisoBcoCobSimples;

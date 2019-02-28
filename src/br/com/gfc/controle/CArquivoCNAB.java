@@ -19,6 +19,8 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,6 +45,8 @@ public class CArquivoCNAB {
     private Scanner ler;
     private NumberFormat ftv;
     private NumberFormat ftq;
+    private List<ArquivoCNAB> listaArquivo;
+    private ArquivoCNAB regAtual;
 
     /**
      * Variáveis de instância para geração do arquivo
@@ -130,6 +134,7 @@ public class CArquivoCNAB {
     private void setaVariaveisLeitura() throws FileNotFoundException, IOException {
         entrada = new FileReader(pg.getLocalBoletoBanco() + nomeArquivo);
         ler = new Scanner(entrada);
+        listaArquivo = new ArrayList<ArquivoCNAB>();
         ftv.getInstance();
         ftq.getInstance();
         ftv = new DecimalFormat("###,###,##0.0000");
@@ -186,6 +191,7 @@ public class CArquivoCNAB {
                 } else if ("1".equals(cnab.getCdTipoRegistro())) {
                     if (lerDetalheItau() == 1) {
                         carregarTabelaDetalhe(interacao);
+                        carregarListaDetalhe();
                     } else {
                         return 0;
                     }
@@ -517,6 +523,13 @@ public class CArquivoCNAB {
         detail[4] = " ";
     }
 
+    /**
+     * Método para carregar a tabela de títulos do detalhe do arquivo
+     *
+     * @param interacao o index da interação da leituro da arquivo para saber se
+     * cria uma novo resultado
+     * @throws SQLException lança uma excecão de erro
+     */
     private void carregarTabelaDetalhe(int interacao) throws SQLException {
         String[] detalhe = new String[10];
         detalhe[0] = this.detalhe[9];
@@ -530,6 +543,73 @@ public class CArquivoCNAB {
         detalhe[8] = String.format("%s%s%s%s%s", this.detalhe[21].substring(0, 2), "/", this.detalhe[21].substring(2, 4), "/20", this.detalhe[21].substring(4, 6));
         detalhe[9] = String.format("%s", ftv.format(Double.valueOf(String.format("%s%s%s", this.detalhe[22].substring(0, 11), ".", this.detalhe[22].substring(11, 13)))));
         tabela.setModel(cm.carregarConteudoTabela(tabela, detalhe, interacao));
+    }
+
+    /**
+     * Método para carregar uma lista com os registros de detalhe do arquivo
+     * Itau
+     */
+    private void carregarListaDetalhe() {
+        listaArquivo.add(new ArquivoCNAB(
+                detalhe[0],
+                detalhe[1],
+                detalhe[2],
+                detalhe[3],
+                detalhe[5],
+                detalhe[6],
+                detalhe[8],
+                detalhe[9],
+                detalhe[11],
+                detalhe[13],
+                detalhe[15],
+                detalhe[16],
+                detalhe[17],
+                detalhe[18],
+                detalhe[21],
+                String.format("%s", Double.valueOf(String.format("%s%s%s", detalhe[22].substring(0, 11), ".", detalhe[22].substring(11, 13)))),
+                detalhe[23],
+                detalhe[24],
+                detalhe[25],
+                detalhe[26],
+                String.format("%s", Double.valueOf(String.format("%s%s%s", detalhe[27].substring(0, 11), ".", detalhe[27].substring(11, 13)))),
+                String.format("%s", Double.valueOf(String.format("%s%s%s", detalhe[29].substring(0, 11), ".", detalhe[29].substring(11, 13)))),
+                String.format("%s", Double.valueOf(String.format("%s%s%s", detalhe[30].substring(0, 11), ".", detalhe[30].substring(11, 13)))),
+                String.format("%s", Double.valueOf(String.format("%s%s%s", detalhe[31].substring(0, 11), ".", detalhe[31].substring(11, 13)))),
+                String.format("%s", Double.valueOf(String.format("%s%s%s", detalhe[32].substring(0, 11), ".", detalhe[32].substring(11, 13)))),
+                String.format("%s", Double.valueOf(String.format("%s%s%s", detalhe[33].substring(0, 11), ".", detalhe[33].substring(11, 13)))),
+                String.format("%s", Double.valueOf(String.format("%s%s%s", detalhe[34].substring(0, 11), ".", detalhe[34].substring(11, 13)))),
+                detalhe[35],
+                detalhe[37],
+                detalhe[38],
+                detalhe[41],
+                detalhe[43],
+                detalhe[45],
+                detalhe[46]));
+    }
+
+    /**
+     * Método para selecionar o registro correlado de acordo com a movimentação
+     * da tabela
+     *
+     * @param idxSequencia index da linha da tabela de registros CNAB
+     * @return retorna o registro atual de acordo a linha posicionada da tabela
+     */
+    public ArquivoCNAB selecionarRegistroDetalhe(int idxSequencia) {
+        regAtual = listaArquivo.get(idxSequencia);
+        return regAtual;
+    }
+
+    /**
+     * Método para zerar a tabela de registro detalhas cnab
+     *
+     * @param tamanho Array de Objeto contendo o tamanho de cada coluna da
+     * tabela
+     * @param campos Array de String contendo as colunas da tabela
+     * @param tipos Array de tipo do campos da tabela
+     * @param editavel Array de boolean informando se o campo é editável ou não
+     */
+    public void zerarTabela(Object[] tamanho, String[] campos, Class[] tipos, boolean[] editavel) {
+        cm.zerarTabela(tabela, tamanho, campos, tipos, editavel);
     }
 
     /**
