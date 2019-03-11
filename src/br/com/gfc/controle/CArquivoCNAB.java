@@ -127,9 +127,8 @@ public class CArquivoCNAB {
 
     /**
      * Método para setar as variáveis de leitura do arquivo
-     *
      * @throws FileNotFoundException
-     * @throws IOException
+     * @throws IOException 
      */
     private void setaVariaveisLeitura() throws FileNotFoundException, IOException {
         entrada = new FileReader(pg.getLocalBoletoBanco() + nomeArquivo);

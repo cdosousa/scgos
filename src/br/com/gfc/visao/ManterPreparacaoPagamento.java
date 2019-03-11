@@ -275,7 +275,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             if (jTabTitulosAgendados.getRowCount() > 0) {
                 linhaTitAgend = 0;
                 ctAgendTitulos.ajustarTabela(jTabTitulosAgendados, 40, 5, 30, 30, 20);
-                buscarCorrelatosTitulo();
+                buscarCorrelatosTitulo(jTabTitulosAgendados.getValueAt(linhaTitAgend, 0).toString());
             }
         } catch (SQLException ex) {
             mensagemTela("Errona busca dos títulos agendados!\nErr: " + ex);
@@ -360,7 +360,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                 try {
                     if (jTabTitulosAgendados.getRowCount() > 0) {
                         linhaTitAgend = jTabTitulosAgendados.getSelectedRow();
-                        buscarCorrelatosTitulo();
+                        buscarCorrelatosTitulo(jTabTitulosAgendados.getValueAt(linhaTitAgend, 0).toString());
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
@@ -376,11 +376,31 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                     if (jTabbPrincipal.getSelectedIndex() == 2 && buscaCNAB && jTabDetalheCNAB.getRowCount() > 0) {
                         linhaDetalheCNAB = jTabDetalheCNAB.getSelectedRow();
                         limparDetalheTelaCNAB();
+                        buscarCorrelatosTitulo(String.format("%s%s", "1",jTabDetalheCNAB.getValueAt(linhaDetalheCNAB, 0).toString()));
                         atualizarDetail();
                     }
                 } catch (Exception ex) {
                     mensagemTela("Erro na busca dos registros correlados da tabela de detalhe do arquivo CNAB!\nErro: " + ex);
                 }
+            }
+        });
+        
+        //Adiciona um keylistener para atabela de detalhes do cnab
+        jTabDetalheCNAB.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                VerificarTecla vt = new VerificarTecla();
+                if("F5".equals(String.format("%s", vt.VerificarTecla(e)).toUpperCase())){
+                    new ManterTitulos(su, conexao, String.format("%s%s", "1",jTabDetalheCNAB.getValueAt(linhaDetalheCNAB, 0))).setVisible(true);
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
             }
         });
 
@@ -540,8 +560,8 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
      *
      * @throws SQLException
      */
-    private void buscarCorrelatosTitulo() throws SQLException {
-        modlan = cpp.buscarCorrelatosTitulo(jTabTitulosAgendados.getValueAt(linhaTitAgend, 0).toString());
+    private void buscarCorrelatosTitulo(String titulo) throws SQLException {
+        modlan = cpp.buscarCorrelatosTitulo(titulo);
         if (modlan != null) {
             jTexNomeRazaoSocial.setText(modlan.getNomeRazaoSocial());
             jTexDocumento.setText(modlan.getDocumento());
@@ -682,19 +702,25 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
      * @throws IOException
      */
     private void gerarArquivoCNAB() throws FileNotFoundException, IOException {
+        boolean parametroAtivo = false;
         cnab = new ArquivoCNAB();
-        cpp.buscarParametrosEDI(cnab, jTexCdInfoTipoPagamento.getText());
-        ccnab = new CArquivoCNAB(cnab, pg, conexao, jTabTitulosAgendados.getRowCount() * 2 + 2, jTabPagamentosAgendados.getValueAt(linhaTitAgend, 0).toString());
-        if (ccnab.prepararArquivo() == 1) {
-            ccnab.gerarArquivo();
+        cpp.buscarParametrosEDI(cnab, jTexCdInfoTipoPagamento.getText(), parametroAtivo);
+        if (parametroAtivo) {
+            ccnab = new CArquivoCNAB(cnab, pg, conexao, jTabTitulosAgendados.getRowCount() * 2 + 2, jTabPagamentosAgendados.getValueAt(linhaTitAgend, 0).toString());
+            if (ccnab.prepararArquivo() == 1) {
+                ccnab.gerarArquivo();
+            }
+        }else{
+            mensagemTela("Este banco não está habilitado para envio de arquivo CNAB");
         }
+
     }
 
     private void imprimirBoleto() throws SQLException, JRException, ParseException {
         cpp.prepararBoleto(jTabPagamentosAgendados.getValueAt(linhaPagamAgend, 0).toString(), "BoletoItau.jasper");
     }
 
-    private void lerArquivoCNAB() throws IOException {
+    private void lerArquivoCNAB() throws FileNotFoundException, IOException {
         cnab = new ArquivoCNAB();
         ccnab = new CArquivoCNAB(cnab, pg, conexao, nomeArquivoRetorno);
         buscaCNAB = true;
@@ -751,6 +777,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
      * Método para atualizar os campos do registro detalhe na tela
      */
     private void atualizarDetail() {
+        dat = new DataSistema();
         cb = ccnab.selecionarRegistroDetalhe(linhaDetalheCNAB);
         jForValorDespCobranca.setText(cb.getValorTarifaCobranca());
         jForValorAbatConcedido.setText(cb.getValorAbatimento());
@@ -766,6 +793,14 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jTexCdLiquidacao.setText(cb.getCdLiquidacao());
         jForDataCredLiquidacao.setText(cb.getDataCredito());
         jTexSeqRegistro.setText(cb.getSequencialRegistro());
+        //Atualiza correlatos
+        jTexCdLancamentoVinc.setText(modlan.getCdLancamento());
+        jForDataEmissaVinc.setText(dat.getDataConv(Date.valueOf(modlan.getDataEmissao())));
+        jForDataVenctoVinc.setText(dat.getDataConv(Date.valueOf(modlan.getDataVencimento())));
+        jForValorVinc.setText(String.valueOf(modlan.getValorLancamento()));
+        jForSaldoVinc.setText(String.valueOf(modlan.getValorSaldo()));
+        jForCpfCnpjVinc.setText(modlan.getCpfCnpj());
+        jTexNomeClienteVinc.setText(modlan.getNomeRazaoSocial());
     }
 
     /**
@@ -785,7 +820,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jTexQtdDetalhes.setText(trailer[17]);
         jForValorTotalInformado.setText(trailer[18]);
     }
-
+    
     /**
      * Método para retornar mensagem na tela
      *
@@ -982,6 +1017,33 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jTexQtdDetalhes = new javax.swing.JTextField();
         jForValTituloCobDirEscriturada = new FormatarValor(FormatarValor.NUMERO)
         ;
+        jPanTituloVinculado = new javax.swing.JPanel();
+        jLabCdLancamentoVinc = new javax.swing.JLabel();
+        jLabDataEmissaVinc = new javax.swing.JLabel();
+        jLabDataVenctoVinc = new javax.swing.JLabel();
+        jLabValorVinc = new javax.swing.JLabel();
+        jLabSaldoVinc = new javax.swing.JLabel();
+        jLabCpfCnpjVinc = new javax.swing.JLabel();
+        jTexCdLancamentoVinc = new javax.swing.JTextField();
+        jForDataEmissaVinc = new javax.swing.JFormattedTextField();
+        jForDataVenctoVinc = new javax.swing.JFormattedTextField();
+        jForValorVinc = new FormatarValor(FormatarValor.NUMERO);
+        jForSaldoVinc = new FormatarValor(FormatarValor.NUMERO);
+        jForCpfCnpjVinc = new javax.swing.JFormattedTextField();
+        jTexNomeClienteVinc = new javax.swing.JTextField();
+        jPanOcorrencias = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jScrollPane7 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        jTextArea2 = new javax.swing.JTextArea();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jScrollPane9 = new javax.swing.JScrollPane();
+        jTextArea3 = new javax.swing.JTextArea();
+        jScrollPane10 = new javax.swing.JScrollPane();
+        jTextArea4 = new javax.swing.JTextArea();
+        jLabel9 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jMenuBar = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
@@ -2308,7 +2370,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jLabPagador.setText("Pagador:");
 
         jLabCdErroMensInfor.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        jLabCdErroMensInfor.setText("Cod. Erro / Msg Infor.:");
+        jLabCdErroMensInfor.setText("Cod.Erro/Msg Inf.:");
 
         jLabCdLiquidacao.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabCdLiquidacao.setText("Cod. Liq.:");
@@ -2324,69 +2386,66 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jPanDetalheArquivoLayout.setHorizontalGroup(
             jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(2, 2, 2)
                 .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabValorDespCobr)
                     .addComponent(jLabValorAbatConced)
                     .addComponent(jLabValorDescConced)
                     .addComponent(jLabValorLiqEmConta)
                     .addComponent(jLabValorJurosMoraMulta)
-                    .addComponent(jLabValorOutrosCred)
-                    .addComponent(jLabValorIOF))
+                    .addComponent(jLabValorOutrosCred))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jForValorJurosMoraMulta, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
                         .addComponent(jForValorLiqEmConta)
                         .addComponent(jForValorOutrosCred))
-                    .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jForValorAbatConcedido, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
-                        .addComponent(jForValorDespCobranca, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jForValorDescConcedido, javax.swing.GroupLayout.Alignment.LEADING))
-                    .addComponent(jForValorIOF, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
-                        .addComponent(jLabDataCredLiquid)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jForDataCredLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 212, Short.MAX_VALUE)
-                        .addComponent(jLabSeqRegistro)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTexSeqRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
-                        .addComponent(jLabPagador)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTexPagador))
-                    .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
-                        .addComponent(jLabCdLiquidacao)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTexCdLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTexNomeLiquidacao))
-                    .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
-                        .addComponent(jLabCdOcorrencia)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTexCdOcorrencia, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTexNomeOcorrencia))
                     .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
                         .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
-                                .addComponent(jLabCdIntrCancel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTexCdIntrCancelamento))
-                            .addComponent(jLabCdErroMensInfor))
+                            .addComponent(jForValorAbatConcedido, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
+                            .addComponent(jForValorDespCobranca, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jForValorDescConcedido, javax.swing.GroupLayout.Alignment.LEADING))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabValorIOF)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jForValorIOF)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 8, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabCdErroMensInfor, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabPagador, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabCdIntrCancel, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabCdOcorrencia, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabCdLiquidacao, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabDataCredLiquid, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jTexCdErroMensInformacao, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTexCdLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTexNomeLiquidacao))
+                    .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(jTexNomeErroMensInfor, javax.swing.GroupLayout.PREFERRED_SIZE, 389, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jTexPagador, javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
-                                .addComponent(jTexCdErroMensInformacao, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jTexCdIntrCancelamento, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTexNomeErroMensInfor))
-                            .addComponent(jTexNomeIntrCancel))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(jTexNomeIntrCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 388, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
+                                .addComponent(jTexCdOcorrencia, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTexNomeOcorrencia, javax.swing.GroupLayout.PREFERRED_SIZE, 388, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
+                                .addComponent(jForDataCredLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(127, 127, 127)
+                                .addComponent(jLabSeqRegistro)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTexSeqRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap())
         );
         jPanDetalheArquivoLayout.setVerticalGroup(
             jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2396,7 +2455,9 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanDetalheArquivoLayout.createSequentialGroup()
                         .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabValorDespCobr, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jForValorDespCobranca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jForValorDespCobranca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabValorIOF)
+                            .addComponent(jForValorIOF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(2, 2, 2)
                         .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabValorAbatConced, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -2417,11 +2478,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                         .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabValorOutrosCred, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jForValorOutrosCred, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(2, 2, 2)
-                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabValorIOF)
-                            .addComponent(jForValorIOF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGap(2, 2, 2))
                     .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
                         .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabCdOcorrencia)
@@ -2447,14 +2504,15 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                             .addComponent(jTexCdLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jTexNomeLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(2, 2, 2)
-                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabSeqRegistro)
-                                .addComponent(jTexSeqRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabDataCredLiquid)
-                                .addComponent(jForDataCredLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabDataCredLiquid)
+                            .addComponent(jForDataCredLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabSeqRegistro)
+                            .addComponent(jTexSeqRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(2, 2, 2))))
+            .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Registro Trailer", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 13))); // NOI18N
@@ -2591,60 +2649,244 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                 .addGap(2, 2, 2))
         );
 
+        jPanTituloVinculado.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Título Vinculado", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 13))); // NOI18N
+
+        jLabCdLancamentoVinc.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabCdLancamentoVinc.setText("Lcto.:");
+
+        jLabDataEmissaVinc.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabDataEmissaVinc.setText("Emissão:");
+
+        jLabDataVenctoVinc.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabDataVenctoVinc.setText("Vcto:");
+
+        jLabValorVinc.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabValorVinc.setText("Valor:");
+
+        jLabSaldoVinc.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabSaldoVinc.setText("Saldo:");
+
+        jLabCpfCnpjVinc.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabCpfCnpjVinc.setText("Cliente:");
+
+        jTexCdLancamentoVinc.setEnabled(false);
+
+        jForDataEmissaVinc.setEnabled(false);
+
+        jForDataVenctoVinc.setEnabled(false);
+
+        jForValorVinc.setEnabled(false);
+
+        jForSaldoVinc.setEnabled(false);
+
+        jForCpfCnpjVinc.setEnabled(false);
+
+        jTexNomeClienteVinc.setEnabled(false);
+
+        javax.swing.GroupLayout jPanTituloVinculadoLayout = new javax.swing.GroupLayout(jPanTituloVinculado);
+        jPanTituloVinculado.setLayout(jPanTituloVinculadoLayout);
+        jPanTituloVinculadoLayout.setHorizontalGroup(
+            jPanTituloVinculadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanTituloVinculadoLayout.createSequentialGroup()
+                .addGap(1, 1, 1)
+                .addGroup(jPanTituloVinculadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabValorVinc)
+                    .addComponent(jLabDataEmissaVinc)
+                    .addComponent(jLabCdLancamentoVinc)
+                    .addComponent(jLabCpfCnpjVinc))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanTituloVinculadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jTexNomeClienteVinc)
+                    .addGroup(jPanTituloVinculadoLayout.createSequentialGroup()
+                        .addGroup(jPanTituloVinculadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jForCpfCnpjVinc, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanTituloVinculadoLayout.createSequentialGroup()
+                                .addGroup(jPanTituloVinculadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jForDataEmissaVinc, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jForValorVinc, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(jPanTituloVinculadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanTituloVinculadoLayout.createSequentialGroup()
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jLabSaldoVinc)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jForSaldoVinc, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanTituloVinculadoLayout.createSequentialGroup()
+                                        .addGap(23, 23, 23)
+                                        .addComponent(jLabDataVenctoVinc)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jForDataVenctoVinc, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(jTexCdLancamentoVinc, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 11, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanTituloVinculadoLayout.setVerticalGroup(
+            jPanTituloVinculadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanTituloVinculadoLayout.createSequentialGroup()
+                .addGap(4, 4, 4)
+                .addGroup(jPanTituloVinculadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabCdLancamentoVinc)
+                    .addComponent(jTexCdLancamentoVinc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(1, 1, 1)
+                .addGroup(jPanTituloVinculadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabDataEmissaVinc)
+                    .addComponent(jLabDataVenctoVinc)
+                    .addComponent(jForDataEmissaVinc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jForDataVenctoVinc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(1, 1, 1)
+                .addGroup(jPanTituloVinculadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabValorVinc)
+                    .addComponent(jLabSaldoVinc)
+                    .addComponent(jForValorVinc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jForSaldoVinc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(1, 1, 1)
+                .addGroup(jPanTituloVinculadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabCpfCnpjVinc)
+                    .addComponent(jForCpfCnpjVinc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(1, 1, 1)
+                .addComponent(jTexNomeClienteVinc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        jPanOcorrencias.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Mensagens do Arquivo", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 13))); // NOI18N
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabel4.setText("Ocorrência.:");
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setLineWrap(true);
+        jTextArea1.setRows(3);
+        jTextArea1.setEnabled(false);
+        jScrollPane7.setViewportView(jTextArea1);
+
+        jTextArea2.setColumns(20);
+        jTextArea2.setLineWrap(true);
+        jTextArea2.setRows(3);
+        jTextArea2.setEnabled(false);
+        jScrollPane8.setViewportView(jTextArea2);
+
+        jLabel7.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabel7.setText("Int.Cancel.:");
+
+        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabel8.setText("Erro/Mensag.:");
+
+        jTextArea3.setColumns(20);
+        jTextArea3.setLineWrap(true);
+        jTextArea3.setRows(3);
+        jTextArea3.setEnabled(false);
+        jScrollPane9.setViewportView(jTextArea3);
+
+        jTextArea4.setColumns(20);
+        jTextArea4.setLineWrap(true);
+        jTextArea4.setRows(3);
+        jTextArea4.setEnabled(false);
+        jScrollPane10.setViewportView(jTextArea4);
+
+        jLabel9.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabel9.setText("Liquidação:");
+
+        javax.swing.GroupLayout jPanOcorrenciasLayout = new javax.swing.GroupLayout(jPanOcorrencias);
+        jPanOcorrencias.setLayout(jPanOcorrenciasLayout);
+        jPanOcorrenciasLayout.setHorizontalGroup(
+            jPanOcorrenciasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanOcorrenciasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanOcorrenciasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanOcorrenciasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane9)
+                    .addComponent(jScrollPane7)
+                    .addComponent(jScrollPane8)
+                    .addComponent(jScrollPane10, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addContainerGap())
+        );
+        jPanOcorrenciasLayout.setVerticalGroup(
+            jPanOcorrenciasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanOcorrenciasLayout.createSequentialGroup()
+                .addGap(4, 4, 4)
+                .addGroup(jPanOcorrenciasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
+                    .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanOcorrenciasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanOcorrenciasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanOcorrenciasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel9))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout jPanRetornoDeArquivoLayout = new javax.swing.GroupLayout(jPanRetornoDeArquivo);
         jPanRetornoDeArquivo.setLayout(jPanRetornoDeArquivoLayout);
         jPanRetornoDeArquivoLayout.setHorizontalGroup(
             jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanRetornoDeArquivoLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanRetornoDeArquivoLayout.createSequentialGroup()
-                            .addComponent(jLabCodigoMovimento)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTexCdMovimento, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTexNomeMovimento, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(18, 18, 18)
-                            .addComponent(jLabTipoServico)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTexCdTipoServico, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTexNomeTipoServico, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabDataArquivo)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jForDataArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanRetornoDeArquivoLayout.createSequentialGroup()
-                            .addComponent(jLabNomeEmpresa)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTexNomeEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(18, 18, 18)
-                            .addComponent(jLabCdBanco)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTexCdBanco, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTexNomeBanco, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(18, 18, 18)
-                            .addComponent(jLabAgenciaConta)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTexCdAgencia, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jLabContaDigito1)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTexCdConta, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jLabContaDigito)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTexCdDigConta, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(18, 18, 18)
-                            .addComponent(jLabDataCreditoArquivo)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jForDataCreditoArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanDetalheArquivo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jPanRetornoDeArquivoLayout.createSequentialGroup()
+                        .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 961, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanTituloVinculado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanRetornoDeArquivoLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanRetornoDeArquivoLayout.createSequentialGroup()
+                                .addComponent(jLabCodigoMovimento)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTexCdMovimento, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTexNomeMovimento, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabTipoServico)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTexCdTipoServico, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTexNomeTipoServico, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabDataArquivo)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jForDataArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanRetornoDeArquivoLayout.createSequentialGroup()
+                                .addComponent(jLabNomeEmpresa)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTexNomeEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabCdBanco)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTexCdBanco, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTexNomeBanco, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabAgenciaConta)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTexCdAgencia, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabContaDigito1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTexCdConta, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabContaDigito)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTexCdDigConta, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabDataCreditoArquivo)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jForDataCreditoArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanRetornoDeArquivoLayout.createSequentialGroup()
+                        .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jPanDetalheArquivo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanOcorrencias, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanRetornoDeArquivoLayout.setVerticalGroup(
@@ -2675,12 +2917,17 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                     .addComponent(jLabDataCreditoArquivo)
                     .addComponent(jForDataCreditoArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabContaDigito1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanDetalheArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(0, 0, 0)
+                .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanTituloVinculado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(4, 4, 4)
+                .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanRetornoDeArquivoLayout.createSequentialGroup()
+                        .addComponent(jPanDetalheArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(4, 4, 4)
+                        .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanOcorrencias, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         jButton1.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
@@ -2719,9 +2966,8 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                     .addComponent(jTexArquivoRetorno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButArquivo)
                     .addComponent(jButton1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanRetornoDeArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGap(5, 5, 5)
+                .addComponent(jPanRetornoDeArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbPrincipal.addTab("CNAB", jPanel6);
@@ -2776,7 +3022,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jTooMenuFerramentas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanGeral, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanGeral, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2993,6 +3239,8 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             lerArquivoCNAB();
         } catch (IOException ex) {
             Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception f) {
+            mensagemTela("Erro na leitura do arquivo!\nErro: " + f);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -3056,6 +3304,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> jComPagarReceber;
     private javax.swing.JComboBox<String> jComSituacao;
     private javax.swing.JComboBox<String> jComTipoLancamento;
+    private javax.swing.JFormattedTextField jForCpfCnpjVinc;
     private javax.swing.JFormattedTextField jForDatEmissaoFin;
     private javax.swing.JFormattedTextField jForDatEmissaoIni;
     private javax.swing.JFormattedTextField jForDatVencimentoFin;
@@ -3063,11 +3312,14 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JFormattedTextField jForDataArquivo;
     private javax.swing.JFormattedTextField jForDataCredLiquidacao;
     private javax.swing.JFormattedTextField jForDataCreditoArquivo;
+    private javax.swing.JFormattedTextField jForDataEmissaVinc;
     private javax.swing.JFormattedTextField jForDataLiquidacaoAte;
     private javax.swing.JFormattedTextField jForDataLiquidacaoDe;
+    private javax.swing.JFormattedTextField jForDataVenctoVinc;
     private javax.swing.JFormattedTextField jForEmissaoTitulo;
     private javax.swing.JFormattedTextField jForNumPreparacao;
     private javax.swing.JFormattedTextField jForQtdeTitulos;
+    private javax.swing.JFormattedTextField jForSaldoVinc;
     private javax.swing.JFormattedTextField jForTotTitPagar;
     private javax.swing.JFormattedTextField jForTotTitReceber;
     private javax.swing.JFormattedTextField jForValTituloCobDirEscriturada;
@@ -3082,6 +3334,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JFormattedTextField jForValorTituloCobSimples;
     private javax.swing.JFormattedTextField jForValorTituloCobVinculada;
     private javax.swing.JFormattedTextField jForValorTotalInformado;
+    private javax.swing.JFormattedTextField jForValorVinc;
     private javax.swing.JLabel jLabAgenciaConta;
     private javax.swing.JLabel jLabArquivoRetorno;
     private javax.swing.JLabel jLabAvisoBcoCobDirEscriturada;
@@ -3090,16 +3343,20 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JLabel jLabCdBanco;
     private javax.swing.JLabel jLabCdErroMensInfor;
     private javax.swing.JLabel jLabCdIntrCancel;
+    private javax.swing.JLabel jLabCdLancamentoVinc;
     private javax.swing.JLabel jLabCdLiquidacao;
     private javax.swing.JLabel jLabCdOcorrencia;
     private javax.swing.JLabel jLabCodigoMovimento;
     private javax.swing.JLabel jLabContaDigito;
     private javax.swing.JLabel jLabContaDigito1;
+    private javax.swing.JLabel jLabCpfCnpjVinc;
     private javax.swing.JLabel jLabDataArquivo;
     private javax.swing.JLabel jLabDataCredLiquid;
     private javax.swing.JLabel jLabDataCreditoArquivo;
+    private javax.swing.JLabel jLabDataEmissaVinc;
     private javax.swing.JLabel jLabDataEmissao;
     private javax.swing.JLabel jLabDataLiquidacao;
+    private javax.swing.JLabel jLabDataVenctoVinc;
     private javax.swing.JLabel jLabDocumento;
     private javax.swing.JLabel jLabInfoPortador;
     private javax.swing.JLabel jLabInfoTipoMovimento;
@@ -3114,6 +3371,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JLabel jLabQtdTituloCobVinculada;
     private javax.swing.JLabel jLabQtdTitulosCobSimples;
     private javax.swing.JLabel jLabQtdeTitulos;
+    private javax.swing.JLabel jLabSaldoVinc;
     private javax.swing.JLabel jLabSeqRegistro;
     private javax.swing.JLabel jLabSituacao;
     private javax.swing.JLabel jLabTipoLancamento;
@@ -3132,11 +3390,16 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JLabel jLabValorTituloCobSimples;
     private javax.swing.JLabel jLabValorTituloCobVinculada;
     private javax.swing.JLabel jLabValorTotalInformado;
+    private javax.swing.JLabel jLabValorVinc;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar;
@@ -3150,9 +3413,11 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JPanel jPanFiltros;
     private javax.swing.JPanel jPanGeral;
     private javax.swing.JPanel jPanInfoPortador;
+    private javax.swing.JPanel jPanOcorrencias;
     private javax.swing.JPanel jPanPagamentosAgendados;
     private javax.swing.JPanel jPanRetornoDeArquivo;
     private javax.swing.JPanel jPanSelecionados;
+    private javax.swing.JPanel jPanTituloVinculado;
     private javax.swing.JPanel jPanTitulos;
     private javax.swing.JPanel jPanTitulosAgendados;
     private javax.swing.JPanel jPanTotaisSelecao;
@@ -3165,11 +3430,15 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane10;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JTable jTabDetalheCNAB;
     private javax.swing.JTable jTabPagamentosAgendados;
@@ -3191,6 +3460,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JTextField jTexCdInfoTipoMovimento;
     private javax.swing.JTextField jTexCdInfoTipoPagamento;
     private javax.swing.JTextField jTexCdIntrCancelamento;
+    private javax.swing.JTextField jTexCdLancamentoVinc;
     private javax.swing.JTextField jTexCdLiquidacao;
     private javax.swing.JTextField jTexCdMovimento;
     private javax.swing.JTextField jTexCdOcorrencia;
@@ -3198,6 +3468,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JTextField jTexDocumento;
     private javax.swing.JTextField jTexNomeBanco;
     private javax.swing.JTextField jTexNomeCliente;
+    private javax.swing.JTextField jTexNomeClienteVinc;
     private javax.swing.JTextField jTexNomeEmpresa;
     private javax.swing.JTextField jTexNomeErroMensInfor;
     private javax.swing.JTextField jTexNomeInfoPortador;
@@ -3216,6 +3487,10 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JTextField jTexQtdTitulosCobSimples;
     private javax.swing.JTextField jTexSeqRegistro;
     private javax.swing.JTextField jTexTipoDocumento;
+    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextArea jTextArea2;
+    private javax.swing.JTextArea jTextArea3;
+    private javax.swing.JTextArea jTextArea4;
     private javax.swing.JToolBar jTooMenuFerramentas;
     // End of variables declaration//GEN-END:variables
 }
