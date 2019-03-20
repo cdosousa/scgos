@@ -71,6 +71,34 @@ public class ManterLiquidacaoTitulo extends javax.swing.JDialog {
                 + "'";
         buscarLancamento();
     }
+    
+    /**
+     * Construto padrão para gerar a liquidação do título via retorno de EDI
+     * @param parent
+     * @param modal
+     * @param conexao
+     * @param su
+     * @param cdLancamento
+     * @param valorLiquidacao
+     * @param dataLiquidacao 
+     */
+    public ManterLiquidacaoTitulo(java.awt.Frame parent, boolean modal, Connection conexao, SessaoUsuario su, String cdLancamento, String valorLiquidacao, String dataLiquidacao) {
+        super(parent, modal);
+        this.conexao = conexao;
+        this.su = su;
+        this.cdLancamento = cdLancamento;
+        initComponents();
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+        formato = NumberFormat.getInstance();
+        formatarCampos();
+        popularTipoMovimento();
+        sql = "select * from gfclancamentos where cd_lancamento = '" + cdLancamento
+                + "'";
+        buscarLancamento();
+        jForValorPago.setText(valorLiquidacao);
+        jForDataLiquidacao.setText(dataLiquidacao);
+    }
 
     private void formatarCampos() {
         jForCdLancamento.setDocument(new DefineCampoInteiro());

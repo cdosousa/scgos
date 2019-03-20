@@ -641,7 +641,7 @@ public class CPreparacaoPagamentos {
      * @param cdTipoPagamento codido do tipo de pagamento a pesquisar
      * @return retorna 1 para verdadeiro ou 0 para falso.
      */
-    public int buscarParametrosEDI(ArquivoCNAB cnab, String cdTipoPagamento, boolean parametroAtivo) {
+    public int buscarParametrosEDI(ArquivoCNAB cnab, String cdTipoPagamento) {
         this.cnab = cnab;
         ParametrosEDI pedi = new ParametrosEDI();
         try {
@@ -667,10 +667,12 @@ public class CPreparacaoPagamentos {
                 cnab.setCdMulta(pedi.getCdJurosMora());
                 mensagem("Código Carteira Pesquisada: " + pedi.getCdCarteira() + "\nCódigo Carteira Gravada: " + cnab.getCdCarteira());
                 switch(pedi.getSituacao()){
-                    case "A":
-                        parametroAtivo = true;
+                    case "1":
+                        cnab.setParametroAtivo(true);
+                        break;
                     default:
-                        parametroAtivo = false;
+                        cnab.setParametroAtivo(false);
+                        break;
                 }
                 return 1;
             } else {

@@ -24,6 +24,7 @@ public class ArquivoCNAB extends ParametrosEDI {
     private String cpfCnpjEmpresa;
     private String horaGeracao;
     private String[] head;
+    private boolean parametroAtivo;
 
     /**
      * Variáveis para informaões do Registro 1 (Detalhe) de remessa
@@ -88,6 +89,12 @@ public class ArquivoCNAB extends ParametrosEDI {
     private String mensagemErrosInfor;
     private String cdLiquidacao;
     private String[] detalhe;
+    
+    /**
+     * Variáveis de registros correlatos
+     */
+    private String descricaoOcorrencia;
+    private boolean ocorrenciaLiquidaTitulo;
     
     /**
      * Variáveis do registro 9 (trailer) retorno
@@ -1104,5 +1111,47 @@ public class ArquivoCNAB extends ParametrosEDI {
      */
     public void setSequencialRegistro(String sequencialRegistro) {
         this.sequencialRegistro = sequencialRegistro;
+    }
+
+    /**
+     * @return the parametroAtivo
+     */
+    public boolean isParametroAtivo() {
+        return parametroAtivo;
+    }
+
+    /**
+     * @param parametroAtivo the parametroAtivo to set
+     */
+    public void setParametroAtivo(boolean parametroAtivo) {
+        this.parametroAtivo = parametroAtivo;
+    }
+
+    /**
+     * @return the descricaoOcorrencia
+     */
+    public String getDescricaoOcorrencia() {
+        return descricaoOcorrencia;
+    }
+
+    /**
+     * @param descricaoOcorrencia the descricaoOcorrencia to set
+     */
+    public void setDescricaoOcorrencia(String descricaoOcorrencia) {
+        this.descricaoOcorrencia = descricaoOcorrencia;
+    }
+
+    /**
+     * @return the ocorrenciaLiquidaTitulo
+     */
+    public boolean isOcorrenciaLiquidaTitulo() {
+        return ocorrenciaLiquidaTitulo;
+    }
+
+    /**
+     * @param ocorrenciaLiquidaTitulo the ocorrenciaLiquidaTitulo to set
+     */
+    public void setOcorrenciaLiquidaTitulo(boolean ocorrenciaLiquidaTitulo) {
+        this.ocorrenciaLiquidaTitulo = ocorrenciaLiquidaTitulo;
     }
 }

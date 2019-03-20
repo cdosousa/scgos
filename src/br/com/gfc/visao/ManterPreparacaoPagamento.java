@@ -376,15 +376,17 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                     if (jTabbPrincipal.getSelectedIndex() == 2 && buscaCNAB && jTabDetalheCNAB.getRowCount() > 0) {
                         linhaDetalheCNAB = jTabDetalheCNAB.getSelectedRow();
                         limparDetalheTelaCNAB();
-                        buscarCorrelatosTitulo(String.format("%s%s", "1",jTabDetalheCNAB.getValueAt(linhaDetalheCNAB, 0).toString()));
                         atualizarDetail();
+                        if (buscarCorrelatosTitulo(String.format("%s%s", "1", jTabDetalheCNAB.getValueAt(linhaDetalheCNAB, 0).toString())) == 1) {
+                            atualizarCorrelatosTabelaCnab();
+                        }
                     }
                 } catch (Exception ex) {
                     mensagemTela("Erro na busca dos registros correlados da tabela de detalhe do arquivo CNAB!\nErro: " + ex);
                 }
             }
         });
-        
+
         //Adiciona um keylistener para atabela de detalhes do cnab
         jTabDetalheCNAB.addKeyListener(new KeyListener() {
             @Override
@@ -394,8 +396,8 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 VerificarTecla vt = new VerificarTecla();
-                if("F5".equals(String.format("%s", vt.VerificarTecla(e)).toUpperCase())){
-                    new ManterTitulos(su, conexao, String.format("%s%s", "1",jTabDetalheCNAB.getValueAt(linhaDetalheCNAB, 0))).setVisible(true);
+                if ("F5".equals(String.format("%s", vt.VerificarTecla(e)).toUpperCase())) {
+                    new ManterTitulos(su, conexao, String.format("%s%s", "1", jTabDetalheCNAB.getValueAt(linhaDetalheCNAB, 0))).setVisible(true);
                 }
             }
 
@@ -560,14 +562,16 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
      *
      * @throws SQLException
      */
-    private void buscarCorrelatosTitulo(String titulo) throws SQLException {
+    private int buscarCorrelatosTitulo(String titulo) throws SQLException {
         modlan = cpp.buscarCorrelatosTitulo(titulo);
         if (modlan != null) {
             jTexNomeRazaoSocial.setText(modlan.getNomeRazaoSocial());
             jTexDocumento.setText(modlan.getDocumento());
             jTexTipoDocumento.setText(modlan.getTipoDocumento());
             jForEmissaoTitulo.setText(dat.getDataConv(Date.valueOf(modlan.getDataEmissao())));
+            return 1;
         }
+        return 0;
     }
 
     /**
@@ -671,12 +675,19 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     }
 
     /**
-     * Método criado para gerar a liquidação do título
+     * Método criado para gerar a liquidação do título manual
      */
-    private void liquidarTitulo() {
-        ManterLiquidacaoTitulo liquidar = new ManterLiquidacaoTitulo(this, rootPaneCheckingEnabled, conexao, su, modlan.getCdLancamento());
+    private void liquidarTitulo(String cdLancamento) {
+        ManterLiquidacaoTitulo liquidar = new ManterLiquidacaoTitulo(this, rootPaneCheckingEnabled, conexao, su, cdLancamento);
         liquidar.setVisible(true);
-        buscarTitulosAgendados();
+    }
+
+    /**
+     * Método criado para gerar a liquidação do título pelo edi
+     */
+    private void liquidarTitulo(String cdLancamento, String valorLiquidacao, String dataLiquidacao) {
+        ManterLiquidacaoTitulo liquidar = new ManterLiquidacaoTitulo(this, rootPaneCheckingEnabled, conexao, su, cdLancamento, valorLiquidacao, dataLiquidacao);
+        liquidar.setVisible(true);
     }
 
     /**
@@ -702,15 +713,14 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
      * @throws IOException
      */
     private void gerarArquivoCNAB() throws FileNotFoundException, IOException {
-        boolean parametroAtivo = false;
         cnab = new ArquivoCNAB();
-        cpp.buscarParametrosEDI(cnab, jTexCdInfoTipoPagamento.getText(), parametroAtivo);
-        if (parametroAtivo) {
-            ccnab = new CArquivoCNAB(cnab, pg, conexao, jTabTitulosAgendados.getRowCount() * 2 + 2, jTabPagamentosAgendados.getValueAt(linhaTitAgend, 0).toString());
+        cpp.buscarParametrosEDI(cnab, jTexCdInfoTipoPagamento.getText());
+        if (cnab.isParametroAtivo() == true) {
+            ccnab = new CArquivoCNAB(cnab, pg, conexao, su, jTabTitulosAgendados.getRowCount() * 2 + 2, jTabPagamentosAgendados.getValueAt(linhaTitAgend, 0).toString());
             if (ccnab.prepararArquivo() == 1) {
                 ccnab.gerarArquivo();
             }
-        }else{
+        } else {
             mensagemTela("Este banco não está habilitado para envio de arquivo CNAB");
         }
 
@@ -787,20 +797,36 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jForValorOutrosCred.setText(cb.getValorOutrosCreditos());
         jForValorIOF.setText(cb.getValorIof());
         jTexCdOcorrencia.setText(cb.getCdOcorrencia());
+        jTexNomeOcorrencia.setText(cb.getDescricaoOcorrencia());
+        jTextAreaOcorrencia.setText(cb.getDescricaoOcorrencia());
         jTexCdIntrCancelamento.setText(cb.getCdInstrucaoCancelada());
         jTexPagador.setText(cb.getNomeCliente());
         jTexCdErroMensInformacao.setText(cb.getMensagemErrosInfor());
         jTexCdLiquidacao.setText(cb.getCdLiquidacao());
         jForDataCredLiquidacao.setText(cb.getDataCredito());
         jTexSeqRegistro.setText(cb.getSequencialRegistro());
-        //Atualiza correlatos
-        jTexCdLancamentoVinc.setText(modlan.getCdLancamento());
-        jForDataEmissaVinc.setText(dat.getDataConv(Date.valueOf(modlan.getDataEmissao())));
-        jForDataVenctoVinc.setText(dat.getDataConv(Date.valueOf(modlan.getDataVencimento())));
-        jForValorVinc.setText(String.valueOf(modlan.getValorLancamento()));
-        jForSaldoVinc.setText(String.valueOf(modlan.getValorSaldo()));
-        jForCpfCnpjVinc.setText(modlan.getCpfCnpj());
-        jTexNomeClienteVinc.setText(modlan.getNomeRazaoSocial());
+    }
+
+    private void atualizarCorrelatosTabelaCnab() {
+        if ("109".equals(jTabDetalheCNAB.getValueAt(linhaDetalheCNAB, 2).toString())) {
+            try {
+                buscarCorrelatosTitulo(String.format("%s%s", "1", jTabDetalheCNAB.getValueAt(linhaDetalheCNAB, 0).toString()));
+            } catch (SQLException ex) {
+                Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            jTexCdLancamentoVinc.setText(modlan.getCdLancamento());
+            jForDataEmissaVinc.setText(dat.getDataConv(Date.valueOf(modlan.getDataEmissao())));
+            jForDataVenctoVinc.setText(dat.getDataConv(Date.valueOf(modlan.getDataVencimento())));
+            jForValorVinc.setText(String.valueOf(modlan.getValorLancamento()));
+            jForSaldoVinc.setText(String.valueOf(modlan.getValorSaldo()));
+            jForCpfCnpjVinc.setText(modlan.getCpfCnpj());
+            jTexNomeClienteVinc.setText(modlan.getNomeRazaoSocial());
+            if (cb.isOcorrenciaLiquidaTitulo()) {
+                jButLiquidarViaEdi.setEnabled(true);
+            } else {
+                jButLiquidarViaEdi.setEnabled(false);
+            }
+        }
     }
 
     /**
@@ -820,7 +846,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jTexQtdDetalhes.setText(trailer[17]);
         jForValorTotalInformado.setText(trailer[18]);
     }
-    
+
     /**
      * Método para retornar mensagem na tela
      *
@@ -1017,6 +1043,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jTexQtdDetalhes = new javax.swing.JTextField();
         jForValTituloCobDirEscriturada = new FormatarValor(FormatarValor.NUMERO)
         ;
+        jButLiquidarViaEdi = new javax.swing.JButton();
         jPanTituloVinculado = new javax.swing.JPanel();
         jLabCdLancamentoVinc = new javax.swing.JLabel();
         jLabDataEmissaVinc = new javax.swing.JLabel();
@@ -1034,7 +1061,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jPanOcorrencias = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jScrollPane7 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        jTextAreaOcorrencia = new javax.swing.JTextArea();
         jScrollPane8 = new javax.swing.JScrollPane();
         jTextArea2 = new javax.swing.JTextArea();
         jLabel7 = new javax.swing.JLabel();
@@ -2477,8 +2504,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                         .addGap(2, 2, 2)
                         .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabValorOutrosCred, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jForValorOutrosCred, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(2, 2, 2))
+                            .addComponent(jForValorOutrosCred, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
                         .addGroup(jPanDetalheArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabCdOcorrencia)
@@ -2508,8 +2534,8 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                             .addComponent(jLabDataCredLiquid)
                             .addComponent(jForDataCredLiquidacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabSeqRegistro)
-                            .addComponent(jTexSeqRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(2, 2, 2))))
+                            .addComponent(jTexSeqRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(2, 2, 2))
             .addGroup(jPanDetalheArquivoLayout.createSequentialGroup()
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
@@ -2556,6 +2582,14 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
 
         jForValorTotalInformado.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
 
+        jButLiquidarViaEdi.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jButLiquidarViaEdi.setText("Liquidar");
+        jButLiquidarViaEdi.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButLiquidarViaEdiActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
@@ -2563,45 +2597,48 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabAvisoBcoCobSimples, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabValorTituloCobSimples, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabQtdTitulosCobSimples, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jForValorTituloCobSimples)
-                    .addComponent(jTexQtdTitulosCobSimples, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTexAvisoBcoCobSimples, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabValorTituloCobVinculada)
-                    .addComponent(jLabAvisoBcoCobVinculada)
-                    .addComponent(jLabQtdTituloCobVinculada))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jForValorTituloCobVinculada)
-                    .addComponent(jTexAvisoBcoCobVinculada, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
-                    .addComponent(jTexQtdTituloCobVinculada, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabValTituloCobDirEscriturada)
-                    .addComponent(jLabQtdTituloCobDirEscriturada)
-                    .addComponent(jLabAvisoBcoCobDirEscriturada))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabAvisoBcoCobSimples, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabValorTituloCobSimples, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabQtdTitulosCobSimples, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jTexAvisoBcoCobDirEscriturada, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
-                            .addComponent(jForValTituloCobDirEscriturada))
-                        .addGap(33, 33, 33)
-                        .addComponent(jLabQtdDetalhes)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTexQtdDetalhes))
-                    .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addComponent(jTexQtdTituloCobDirEscriturada, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jForValorTituloCobSimples)
+                            .addComponent(jTexQtdTitulosCobSimples, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTexAvisoBcoCobSimples, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
-                        .addComponent(jLabValorTotalInformado)
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabValorTituloCobVinculada)
+                            .addComponent(jLabAvisoBcoCobVinculada)
+                            .addComponent(jLabQtdTituloCobVinculada))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jForValorTotalInformado, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jForValorTituloCobVinculada)
+                            .addComponent(jTexAvisoBcoCobVinculada, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                            .addComponent(jTexQtdTituloCobVinculada, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabValTituloCobDirEscriturada)
+                            .addComponent(jLabQtdTituloCobDirEscriturada)
+                            .addComponent(jLabAvisoBcoCobDirEscriturada))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jTexAvisoBcoCobDirEscriturada, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                                    .addComponent(jForValTituloCobDirEscriturada))
+                                .addGap(33, 33, 33)
+                                .addComponent(jLabQtdDetalhes)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTexQtdDetalhes))
+                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                .addComponent(jTexQtdTituloCobDirEscriturada, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabValorTotalInformado)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jForValorTotalInformado, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(jButLiquidarViaEdi))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
@@ -2646,7 +2683,9 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabAvisoBcoCobVinculada)
                         .addComponent(jTexAvisoBcoCobVinculada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(2, 2, 2))
+                .addGap(2, 2, 2)
+                .addComponent(jButLiquidarViaEdi)
+                .addContainerGap())
         );
 
         jPanTituloVinculado.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Título Vinculado", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 13))); // NOI18N
@@ -2751,11 +2790,11 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabel4.setText("Ocorrência.:");
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(3);
-        jTextArea1.setEnabled(false);
-        jScrollPane7.setViewportView(jTextArea1);
+        jTextAreaOcorrencia.setColumns(20);
+        jTextAreaOcorrencia.setLineWrap(true);
+        jTextAreaOcorrencia.setRows(3);
+        jTextAreaOcorrencia.setEnabled(false);
+        jScrollPane7.setViewportView(jTextAreaOcorrencia);
 
         jTextArea2.setColumns(20);
         jTextArea2.setLineWrap(true);
@@ -2880,7 +2919,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                                 .addComponent(jLabDataCreditoArquivo)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jForDataCreditoArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 0, 0))
                     .addGroup(jPanRetornoDeArquivoLayout.createSequentialGroup()
                         .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jPanDetalheArquivo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -2917,11 +2956,11 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                     .addComponent(jLabDataCreditoArquivo)
                     .addComponent(jForDataCreditoArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabContaDigito1))
-                .addGap(0, 0, 0)
+                .addGap(1, 1, 1)
                 .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanTituloVinculado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(4, 4, 4)
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(1, 1, 1)
                 .addGroup(jPanRetornoDeArquivoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanRetornoDeArquivoLayout.createSequentialGroup()
                         .addComponent(jPanDetalheArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -2945,7 +2984,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanRetornoDeArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanRetornoDeArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addComponent(jLabArquivoRetorno)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -2953,9 +2992,8 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButArquivo)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton1)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(jButton1)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2966,8 +3004,8 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                     .addComponent(jTexArquivoRetorno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButArquivo)
                     .addComponent(jButton1))
-                .addGap(5, 5, 5)
-                .addComponent(jPanRetornoDeArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(2, 2, 2)
+                .addComponent(jPanRetornoDeArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jTabbPrincipal.addTab("CNAB", jPanel6);
@@ -3184,7 +3222,9 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     }//GEN-LAST:event_jButSalvarPreparacaoActionPerformed
 
     private void jButLiquidarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButLiquidarActionPerformed
-        liquidarTitulo();
+        liquidarTitulo(modlan.getCdLancamento());
+        buscarTitulosAgendados();
+
     }//GEN-LAST:event_jButLiquidarActionPerformed
 
     private void jButImprimirPrepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButImprimirPrepActionPerformed
@@ -3231,6 +3271,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     }//GEN-LAST:event_jTexArquivoRetornoKeyPressed
 
     private void jButArquivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButArquivoActionPerformed
+        linhaDetalheCNAB = 0;
         buscarArquivoCNAB();
     }//GEN-LAST:event_jButArquivoActionPerformed
 
@@ -3243,6 +3284,14 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             mensagemTela("Erro na leitura do arquivo!\nErro: " + f);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButLiquidarViaEdiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButLiquidarViaEdiActionPerformed
+        if (cb.isOcorrenciaLiquidaTitulo()) {
+            dat = new DataSistema();
+            String data = dat.getDataConv(jForDataCredLiquidacao.getText());
+            liquidarTitulo(modlan.getCdLancamento(), jForValorLiqEmConta.getText(), jForDataCredLiquidacao.getText().replace("/", "-"));
+        }
+    }//GEN-LAST:event_jButLiquidarViaEdiActionPerformed
 
     /**
      * @param args the command line arguments
@@ -3290,6 +3339,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JButton jButExcluir;
     private javax.swing.JButton jButImprimirPrep;
     private javax.swing.JButton jButLiquidar;
+    private javax.swing.JButton jButLiquidarViaEdi;
     private javax.swing.JButton jButMarcarDesmarcar;
     private javax.swing.JButton jButNovo;
     private javax.swing.JButton jButPesquisar;
@@ -3487,10 +3537,10 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private javax.swing.JTextField jTexQtdTitulosCobSimples;
     private javax.swing.JTextField jTexSeqRegistro;
     private javax.swing.JTextField jTexTipoDocumento;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jTextArea2;
     private javax.swing.JTextArea jTextArea3;
     private javax.swing.JTextArea jTextArea4;
+    private javax.swing.JTextArea jTextAreaOcorrencia;
     private javax.swing.JToolBar jTooMenuFerramentas;
     // End of variables declaration//GEN-END:variables
 }

@@ -10,6 +10,7 @@ package br.com.gfc.visao;
 import br.com.DAO.ConsultaModelo;
 import br.com.gfc.controle.CTipoCarteiraEDI;
 import br.com.gfc.controle.CTipoServicoEDI;
+import br.com.gfc.modelo.EdiOcorrencia;
 import br.com.gfc.modelo.Portadores;
 import br.com.gfc.modelo.TipoServicoEDI;
 import br.com.gfc.modelo.TipoCarteiraEDI;
@@ -20,6 +21,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.sql.SQLException;
 import java.sql.Connection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultCellEditor;
@@ -52,6 +54,7 @@ public class ManterPortadoresParamEDI extends javax.swing.JFrame {
     private static Portadores por;
     private TipoServicoEDI modtedi;
     private TipoCarteiraEDI modcedi;
+    private List< EdiOcorrencia> resultado;
     private ConsultaModelo cTp;
     private ConsultaModelo cCar;
 
@@ -97,7 +100,7 @@ public class ManterPortadoresParamEDI extends javax.swing.JFrame {
         initComponents();
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        setaVariaveis();
+        setaVariaveis();    
         this.dispose();
     }
 

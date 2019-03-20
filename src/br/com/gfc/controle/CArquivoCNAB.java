@@ -8,8 +8,10 @@ package br.com.gfc.controle;
 import br.com.DAO.ConsultaModelo;
 import br.com.controle.CPosicionarArquivo;
 import br.com.gfc.modelo.ArquivoCNAB;
+import br.com.gfc.modelo.EdiOcorrencia;
 import br.com.modelo.DataSistema;
 import br.com.modelo.ParametrosGerais;
+import br.com.modelo.SessaoUsuario;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -40,6 +42,7 @@ public class CArquivoCNAB {
     private ArquivoCNAB cnab;
     private ParametrosGerais pg;
     private Connection conexao;
+    private SessaoUsuario su;
     private CPosicionarArquivo cpc;
     private static FileReader entrada;
     private Scanner ler;
@@ -89,10 +92,11 @@ public class CArquivoCNAB {
      * @throws FileNotFoundException Lançamento de erro de exeção
      * @throws IOException Lançamento de erro de exeção
      */
-    public CArquivoCNAB(ArquivoCNAB cnab, ParametrosGerais pg, Connection conexao, int linhas, String cdPreparacao) throws FileNotFoundException, IOException {
+    public CArquivoCNAB(ArquivoCNAB cnab, ParametrosGerais pg, Connection conexao, SessaoUsuario su, int linhas, String cdPreparacao) throws FileNotFoundException, IOException {
         this.cnab = cnab;
         this.pg = pg;
         this.conexao = conexao;
+        this.su = su;
         this.cdPreparacao = cdPreparacao;
         arquivo = new String[linhas];
         setaVariaveisEscrita();
@@ -595,7 +599,27 @@ public class CArquivoCNAB {
      */
     public ArquivoCNAB selecionarRegistroDetalhe(int idxSequencia) {
         regAtual = listaArquivo.get(idxSequencia);
+        buscarOcorencia();
         return regAtual;
+    }
+    
+    private void buscarOcorencia(){
+        EdiOcorrencia eo = new EdiOcorrencia();
+        try {
+            CEdiOcorrencia ceo = new CEdiOcorrencia(conexao,su);
+            String sqleo = "SELECT * FROM GFCEDIOCORRENCIA WHERE CD_BANCO = '" + regAtual.getCdBanco() + 
+                    "' AND CD_OCORRENCIA = '" + regAtual.getCdOcorrencia() + 
+                    "'";
+            ceo.pesquisar(sqleo);
+            ceo.mostrarPesquisa(eo, 0);
+            regAtual.setDescricaoOcorrencia(eo.getNomeOcorrencia());
+            if("S".equals(eo.getLiquidarTitulo())){
+                regAtual.setOcorrenciaLiquidaTitulo(true);
+            }else
+                regAtual.setOcorrenciaLiquidaTitulo(false);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Erro na busca do Nome do Banco!\nPrograma CEdiOcorrencia.\nErro: " + ex);
+        }
     }
 
     /**

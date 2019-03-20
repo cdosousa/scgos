@@ -2055,7 +2055,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jPanRetornoDeArquivo" max="32767" attributes="0"/>
+                              <Component id="jPanRetornoDeArquivo" min="-2" max="-2" attributes="0"/>
                               <Group type="102" attributes="0">
                                   <Component id="jLabArquivoRetorno" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -2064,10 +2064,9 @@
                                   <Component id="jButArquivo" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                   <Component id="jButton1" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -2081,8 +2080,8 @@
                               <Component id="jButArquivo" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
-                          <Component id="jPanRetornoDeArquivo" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+                          <Component id="jPanRetornoDeArquivo" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -2184,7 +2183,7 @@
                                               <Component id="jForDataCreditoArquivo" min="-2" pref="103" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
-                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                      <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
                                   </Group>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Group type="103" groupAlignment="1" max="-2" attributes="0">
@@ -2229,12 +2228,12 @@
                                   <Component id="jForDataCreditoArquivo" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabContaDigito1" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="1" attributes="0">
                                   <Component id="jPanTituloVinculado" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jScrollPane6" min="-2" pref="141" max="-2" attributes="0"/>
+                                  <Component id="jScrollPane6" min="-2" pref="135" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
                                       <Component id="jPanDetalheArquivo" min="-2" max="-2" attributes="0"/>
@@ -2570,7 +2569,6 @@
                                               <Component id="jLabValorOutrosCred" alignment="3" max="32767" attributes="0"/>
                                               <Component id="jForValorOutrosCred" alignment="3" min="-2" max="-2" attributes="0"/>
                                           </Group>
-                                          <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Group type="103" groupAlignment="3" attributes="0">
@@ -2608,9 +2606,9 @@
                                               <Component id="jLabSeqRegistro" alignment="3" min="-2" max="-2" attributes="0"/>
                                               <Component id="jTexSeqRegistro" alignment="3" min="-2" max="-2" attributes="0"/>
                                           </Group>
-                                          <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
+                                  <EmptySpace min="2" pref="2" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="jSeparator2" min="-2" pref="144" max="-2" attributes="0"/>
@@ -2857,53 +2855,58 @@
                               <Group type="102" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jLabAvisoBcoCobSimples" alignment="1" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabValorTituloCobSimples" alignment="1" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabQtdTitulosCobSimples" alignment="1" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="jForValorTituloCobSimples" max="32767" attributes="0"/>
-                                      <Component id="jTexQtdTitulosCobSimples" min="-2" pref="50" max="-2" attributes="0"/>
-                                      <Component id="jTexAvisoBcoCobSimples" alignment="0" pref="100" max="32767" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="1" attributes="0">
-                                      <Component id="jLabValorTituloCobVinculada" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabAvisoBcoCobVinculada" alignment="1" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabQtdTituloCobVinculada" alignment="1" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="jForValorTituloCobVinculada" max="32767" attributes="0"/>
-                                      <Component id="jTexAvisoBcoCobVinculada" pref="100" max="32767" attributes="0"/>
-                                      <Component id="jTexQtdTituloCobVinculada" alignment="0" min="-2" pref="50" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="1" attributes="0">
-                                      <Component id="jLabValTituloCobDirEscriturada" alignment="1" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabQtdTituloCobDirEscriturada" alignment="1" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabAvisoBcoCobDirEscriturada" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                       <Group type="102" attributes="0">
-                                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                              <Component id="jTexAvisoBcoCobDirEscriturada" pref="100" max="32767" attributes="0"/>
-                                              <Component id="jForValTituloCobDirEscriturada" max="32767" attributes="0"/>
+                                          <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="jLabAvisoBcoCobSimples" alignment="1" min="-2" max="-2" attributes="0"/>
+                                              <Component id="jLabValorTituloCobSimples" alignment="1" min="-2" max="-2" attributes="0"/>
+                                              <Component id="jLabQtdTitulosCobSimples" alignment="1" min="-2" max="-2" attributes="0"/>
                                           </Group>
-                                          <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
-                                          <Component id="jLabQtdDetalhes" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="jTexQtdDetalhes" max="32767" attributes="0"/>
-                                      </Group>
-                                      <Group type="102" attributes="0">
-                                          <Component id="jTexQtdTituloCobDirEscriturada" min="-2" pref="50" max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                              <Component id="jForValorTituloCobSimples" max="32767" attributes="0"/>
+                                              <Component id="jTexQtdTitulosCobSimples" min="-2" pref="50" max="-2" attributes="0"/>
+                                              <Component id="jTexAvisoBcoCobSimples" alignment="0" pref="100" max="32767" attributes="0"/>
+                                          </Group>
                                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                                          <Component id="jLabValorTotalInformado" min="-2" max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="1" attributes="0">
+                                              <Component id="jLabValorTituloCobVinculada" min="-2" max="-2" attributes="0"/>
+                                              <Component id="jLabAvisoBcoCobVinculada" alignment="1" min="-2" max="-2" attributes="0"/>
+                                              <Component id="jLabQtdTituloCobVinculada" alignment="1" min="-2" max="-2" attributes="0"/>
+                                          </Group>
                                           <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="jForValorTotalInformado" min="-2" pref="100" max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                              <Component id="jForValorTituloCobVinculada" max="32767" attributes="0"/>
+                                              <Component id="jTexAvisoBcoCobVinculada" pref="100" max="32767" attributes="0"/>
+                                              <Component id="jTexQtdTituloCobVinculada" alignment="0" min="-2" pref="50" max="-2" attributes="0"/>
+                                          </Group>
+                                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="1" attributes="0">
+                                              <Component id="jLabValTituloCobDirEscriturada" alignment="1" min="-2" max="-2" attributes="0"/>
+                                              <Component id="jLabQtdTituloCobDirEscriturada" alignment="1" min="-2" max="-2" attributes="0"/>
+                                              <Component id="jLabAvisoBcoCobDirEscriturada" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                              <Group type="102" attributes="0">
+                                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                                      <Component id="jTexAvisoBcoCobDirEscriturada" pref="100" max="32767" attributes="0"/>
+                                                      <Component id="jForValTituloCobDirEscriturada" max="32767" attributes="0"/>
+                                                  </Group>
+                                                  <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
+                                                  <Component id="jLabQtdDetalhes" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace max="-2" attributes="0"/>
+                                                  <Component id="jTexQtdDetalhes" max="32767" attributes="0"/>
+                                              </Group>
+                                              <Group type="102" attributes="0">
+                                                  <Component id="jTexQtdTituloCobDirEscriturada" min="-2" pref="50" max="-2" attributes="0"/>
+                                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                                  <Component id="jLabValorTotalInformado" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace max="-2" attributes="0"/>
+                                                  <Component id="jForValorTotalInformado" min="-2" pref="100" max="-2" attributes="0"/>
+                                              </Group>
+                                          </Group>
                                       </Group>
+                                      <Component id="jButLiquidarViaEdi" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="32767" attributes="0"/>
                               </Group>
@@ -2964,6 +2967,8 @@
                                       </Group>
                                   </Group>
                                   <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+                                  <Component id="jButLiquidarViaEdi" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -3105,6 +3110,17 @@
                           <AuxValues>
                             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new FormatarValor(FormatarValor.NUMERO)&#xd;&#xa;"/>
                           </AuxValues>
+                        </Component>
+                        <Component class="javax.swing.JButton" name="jButLiquidarViaEdi">
+                          <Properties>
+                            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                              <Font name="Tahoma" size="13" style="1"/>
+                            </Property>
+                            <Property name="text" type="java.lang.String" value="Liquidar"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButLiquidarViaEdiActionPerformed"/>
+                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -3373,7 +3389,7 @@
 
                           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
                           <SubComponents>
-                            <Component class="javax.swing.JTextArea" name="jTextArea1">
+                            <Component class="javax.swing.JTextArea" name="jTextAreaOcorrencia">
                               <Properties>
                                 <Property name="columns" type="int" value="20"/>
                                 <Property name="lineWrap" type="boolean" value="true"/>
