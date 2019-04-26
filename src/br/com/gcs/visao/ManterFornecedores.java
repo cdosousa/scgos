@@ -9,6 +9,7 @@ package br.com.gcs.visao;
 
 // objetos do registro Pai
 // Objetos para pesquisa de correlato
+import br.com.controle.CCalculaDigitoVerificar;
 import br.com.modelo.EnderecoPostal;
 import br.com.controle.CEnderecoPostal;
 import br.com.gcs.controle.CFornecedores;
@@ -50,6 +51,7 @@ public class ManterFornecedores extends javax.swing.JFrame {
     private static Connection conexao;
     private static SessaoUsuario su;
     private VerificarTecla vt;
+    private CCalculaDigitoVerificar digV;
 
     // Variáveis de instância de objetos da classe
     private Fornecedores regCorr;

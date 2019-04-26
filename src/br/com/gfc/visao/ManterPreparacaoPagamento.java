@@ -102,6 +102,7 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private int linhaTitAgend;
     private int linhaDetalheCNAB;
     private boolean moverLinha = true;
+    private boolean moverLinhaTitulosAgendados = true;
     private boolean botaoMarcarDesmarcar = false;
     private boolean marcarLinha = false;
     private boolean buscaCNAB = false;
@@ -273,9 +274,11 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             ctAgendTitulos.setQuery(sqlAgendamentoTitulos);
             jTabTitulosAgendados.setModel(ctAgendTitulos);
             if (jTabTitulosAgendados.getRowCount() > 0) {
-                linhaTitAgend = 0;
+                //linhaTitAgend = 0;
                 ctAgendTitulos.ajustarTabela(jTabTitulosAgendados, 40, 5, 30, 30, 20);
-                buscarCorrelatosTitulo(jTabTitulosAgendados.getValueAt(linhaTitAgend, 0).toString());
+                if (linhaTitAgend >= 0) {
+                    buscarCorrelatosTitulo(jTabTitulosAgendados.getValueAt(linhaTitAgend, 0).toString());
+                }
             }
         } catch (SQLException ex) {
             mensagemTela("Errona busca dos títulos agendados!\nErr: " + ex);
@@ -358,13 +361,39 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 try {
-                    if (jTabTitulosAgendados.getRowCount() > 0) {
-                        linhaTitAgend = jTabTitulosAgendados.getSelectedRow();
-                        buscarCorrelatosTitulo(jTabTitulosAgendados.getValueAt(linhaTitAgend, 0).toString());
+                    if (moverLinhaTitulosAgendados) {
+                        if (jTabTitulosAgendados.getRowCount() > 0) {
+                            System.out.println("\n");
+                            System.out.println("Linha da Tabela de titulos agendados: " + jTabTitulosAgendados.getSelectedRow());
+                            linhaTitAgend = jTabTitulosAgendados.getSelectedRow();
+                            System.out.println("Variável linhaTitAgend: " + linhaTitAgend);
+                            if (linhaTitAgend >= 0) {
+                                buscarCorrelatosTitulo(jTabTitulosAgendados.getValueAt(linhaTitAgend, 0).toString());
+                            }
+                        }
                     }
+                    moverLinhaTitulosAgendados = true;
                 } catch (SQLException ex) {
                     Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
+        });
+
+        jTabTitulosAgendados.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                VerificarTecla vt = new VerificarTecla();
+                if ("F5".equals(String.format("%s", vt.VerificarTecla(e)).toUpperCase())) {
+                    zoomTitulo();
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
             }
         });
 
@@ -377,8 +406,10 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
                         linhaDetalheCNAB = jTabDetalheCNAB.getSelectedRow();
                         limparDetalheTelaCNAB();
                         atualizarDetail();
-                        if (buscarCorrelatosTitulo(String.format("%s%s", "1", jTabDetalheCNAB.getValueAt(linhaDetalheCNAB, 0).toString())) == 1) {
-                            atualizarCorrelatosTabelaCnab();
+                        if (linhaDetalheCNAB >= 0) {
+                            if (buscarCorrelatosTitulo(String.format("%s%s", "1", jTabDetalheCNAB.getValueAt(linhaDetalheCNAB, 0).toString())) == 1) {
+                                atualizarCorrelatosTabelaCnab();
+                            }
                         }
                     }
                 } catch (Exception ex) {
@@ -680,13 +711,14 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private void liquidarTitulo(String cdLancamento) {
         ManterLiquidacaoTitulo liquidar = new ManterLiquidacaoTitulo(this, rootPaneCheckingEnabled, conexao, su, cdLancamento);
         liquidar.setVisible(true);
+        moverLinhaTitulosAgendados = false;
     }
 
     /**
      * Método criado para gerar a liquidação do título pelo edi
      */
-    private void liquidarTitulo(String cdLancamento, String valorLiquidacao, String dataLiquidacao) {
-        ManterLiquidacaoTitulo liquidar = new ManterLiquidacaoTitulo(this, rootPaneCheckingEnabled, conexao, su, cdLancamento, valorLiquidacao, dataLiquidacao);
+    private void liquidarTitulo(String cdLancamento, double valorLiquidacao, String dataLiquidacao) {
+        ManterLiquidacaoTitulo liquidar = new ManterLiquidacaoTitulo(this, rootPaneCheckingEnabled, conexao, su, cdLancamento, true, valorLiquidacao, dataLiquidacao);
         liquidar.setVisible(true);
     }
 
@@ -716,9 +748,12 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         cnab = new ArquivoCNAB();
         cpp.buscarParametrosEDI(cnab, jTexCdInfoTipoPagamento.getText());
         if (cnab.isParametroAtivo() == true) {
-            ccnab = new CArquivoCNAB(cnab, pg, conexao, su, jTabTitulosAgendados.getRowCount() * 2 + 2, jTabPagamentosAgendados.getValueAt(linhaTitAgend, 0).toString());
+            //mensagemTela("Linha Posicionada: " + linhaPagamAgend);
+            ccnab = new CArquivoCNAB(cnab, pg, conexao, su, jTabTitulosAgendados.getRowCount() * 2 + 2, jTabPagamentosAgendados.getValueAt(linhaPagamAgend, 0).toString());
             if (ccnab.prepararArquivo() == 1) {
-                ccnab.gerarArquivo();
+                if (ccnab.gerarArquivo() == 1) {
+                    ccnab.atualizarLancamento();
+                }
             }
         } else {
             mensagemTela("Este banco não está habilitado para envio de arquivo CNAB");
@@ -810,7 +845,9 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
     private void atualizarCorrelatosTabelaCnab() {
         if ("109".equals(jTabDetalheCNAB.getValueAt(linhaDetalheCNAB, 2).toString())) {
             try {
-                buscarCorrelatosTitulo(String.format("%s%s", "1", jTabDetalheCNAB.getValueAt(linhaDetalheCNAB, 0).toString()));
+                if (linhaDetalheCNAB >= 0) {
+                    buscarCorrelatosTitulo(String.format("%s%s", "1", jTabDetalheCNAB.getValueAt(linhaDetalheCNAB, 0).toString()));
+                }
             } catch (SQLException ex) {
                 Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -845,6 +882,11 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
         jTexAvisoBcoCobDirEscriturada.setText(trailer[15]);
         jTexQtdDetalhes.setText(trailer[17]);
         jForValorTotalInformado.setText(trailer[18]);
+    }
+
+    private void zoomTitulo() {
+        String cdLancamento = jTabTitulosAgendados.getValueAt(linhaTitAgend, 0).toString();
+        new ManterTitulos(su, conexao, cdLancamento).setVisible(true);
     }
 
     /**
@@ -3287,9 +3329,11 @@ public class ManterPreparacaoPagamento extends javax.swing.JFrame {
 
     private void jButLiquidarViaEdiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButLiquidarViaEdiActionPerformed
         if (cb.isOcorrenciaLiquidaTitulo()) {
-            dat = new DataSistema();
-            String data = dat.getDataConv(jForDataCredLiquidacao.getText());
-            liquidarTitulo(modlan.getCdLancamento(), jForValorLiqEmConta.getText(), jForDataCredLiquidacao.getText().replace("/", "-"));
+            try {
+                liquidarTitulo(modlan.getCdLancamento(), formato.parse(jForValorLiqEmConta.getText()).doubleValue(), jForDataCredLiquidacao.getText().replace("/", "-"));
+            } catch (ParseException ex) {
+                Logger.getLogger(ManterPreparacaoPagamento.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_jButLiquidarViaEdiActionPerformed
 

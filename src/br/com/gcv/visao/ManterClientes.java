@@ -99,6 +99,7 @@ public class ManterClientes extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         controleBotoes(ISBOTAO, !ISBOTAO, !ISBOTAO, ISBOTAO, !ISBOTAO, ISBOTAO);
         bloquearCampos();
+        jTexNomeRazaoSocial.setEditable(true);
         this.dispose();
     }
 
@@ -1396,7 +1397,7 @@ public class ManterClientes extends javax.swing.JFrame {
         if (jTexNomeRazaoSocial.getText().isEmpty()) {
             sql = "SELECT * FROM GCVCLIENTES";
         } else {
-            sql = "SELECT * FROM GCVCLIENTES WHERE NOME_RAZAOSOCIAL LIKE '" + jTexNomeRazaoSocial.getText().trim() + "'";
+            sql = "SELECT * FROM GCVCLIENTES WHERE NOME_RAZAOSOCIAL LIKE '%" + jTexNomeRazaoSocial.getText().trim() + "%'";
         }
         bloquearCampos();
         controleBotoes(ISBOTAO, ISBOTAO, !ISBOTAO, ISBOTAO, !ISBOTAO, ISBOTAO);
@@ -1420,6 +1421,7 @@ public class ManterClientes extends javax.swing.JFrame {
         // TODO add your handling code here:
         limparTela();
         bloquearCampos();
+        jTexNomeRazaoSocial.setEditable(true);
         controleBotoes(ISBOTAO, !ISBOTAO, !ISBOTAO, ISBOTAO, !ISBOTAO, ISBOTAO);
         desabilitaDirecionais();
     }//GEN-LAST:event_jButCancelarActionPerformed

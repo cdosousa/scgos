@@ -7,9 +7,12 @@ package br.com.gfc.controle;
 
 import br.com.DAO.ConsultaModelo;
 import br.com.controle.CPosicionarArquivo;
+import br.com.gfc.dao.LancamentosDAO;
 import br.com.gfc.modelo.ArquivoCNAB;
 import br.com.gfc.modelo.EdiOcorrencia;
+import br.com.gfc.modelo.Lancamentos;
 import br.com.modelo.DataSistema;
+import br.com.modelo.HoraSistema;
 import br.com.modelo.ParametrosGerais;
 import br.com.modelo.SessaoUsuario;
 import java.io.FileNotFoundException;
@@ -50,6 +53,7 @@ public class CArquivoCNAB {
     private NumberFormat ftq;
     private List<ArquivoCNAB> listaArquivo;
     private ArquivoCNAB regAtual;
+    private ConsultaModelo cnabTitulos;
 
     /**
      * Variáveis de instância para geração do arquivo
@@ -59,6 +63,7 @@ public class CArquivoCNAB {
     private static FileWriter saida;
     private String[] arquivo;
     private int idxArq = 1;
+    private String[] sequenciaLancamento;
 
     /**
      * Variáveis de instância para leitura do arquivo
@@ -126,13 +131,14 @@ public class CArquivoCNAB {
      * @throws IOException
      */
     private void setaVariaveisEscrita() throws FileNotFoundException, IOException {
-        saida = new FileWriter(pg.getLocalBoletoBanco() + "remessa.txt");
+        saida = new FileWriter(pg.getLocalBoletoBanco() + String.format("%s%s", cdPreparacao.substring(2, 10),".REM"));
     }
 
     /**
      * Método para setar as variáveis de leitura do arquivo
+     *
      * @throws FileNotFoundException
-     * @throws IOException 
+     * @throws IOException
      */
     private void setaVariaveisLeitura() throws FileNotFoundException, IOException {
         entrada = new FileReader(pg.getLocalBoletoBanco() + nomeArquivo);
@@ -254,6 +260,7 @@ public class CArquivoCNAB {
      * @return
      */
     public int criarDetalheItau() {
+        DecimalFormat df = new DecimalFormat("#,###.00");
         String[] tipo = {"9", "9", "9", "9", "9", "9", "9", "X", "9", "X", "9", "9V", "9", "X", "X", "9", "X", "9", "9V", "9", "9", "X", "X", "9", "X", "X", "9V", "9", "9V", "9V", "9V", "9", "9", "X", "X", "X", "X",
             "9", "X", "X", "X", "X", "9", "9", "X", "9"};
         int[] tamanho = {1, 2, 14, 4, 2, 5, 1, 4, 4, 25, 8, 13, 3, 21, 1, 2, 10, 6, 13, 3, 5, 2, 1, 6, 2, 2, 13, 6, 13, 13, 13, 2, 14, 30, 10, 40, 12, 8, 15, 2, 30, 4, 6, 2, 1, 6};
@@ -262,41 +269,47 @@ public class CArquivoCNAB {
         try {
             String sql = "select * from vw_gfccnabitautitulos where preparacao = '" + cdPreparacao
                     + "'";
-            ConsultaModelo cm = new ConsultaModelo(conexao);
-            cm.setQuery(sql);
+            cnabTitulos = new ConsultaModelo(conexao);
+            cnabTitulos.setQuery(sql);
             //mensagem("Preparacao: " + cdPreparacao + "\nTítulos Encontrados: " + cm.getRowCount());
-            if (cm.getRowCount() > 0) {
+            if (cnabTitulos.getRowCount() > 0) {
+                sequenciaLancamento = new String[cnabTitulos.getRowCount()];
                 DataSistema dat = new DataSistema();
                 dat.setData("");
-                for (int i = 0; i < cm.getRowCount(); i++) {
-                    detail[9] = cm.getValueAt(i, 3).toString(); //identicicação do título
-                    detail[10] = cm.getValueAt(i, 2).toString(); // nosso número
-                    detail[16] = cm.getValueAt(i, 4).toString(); // Numero documento de Cobrança (Dupl, NP, Etc.)
-                    String vcto = dat.getDataConv(Date.valueOf(cm.getValueAt(i, 5).toString())).replaceAll("/", "");
+                for (int i = 0; i < cnabTitulos.getRowCount(); i++) {
+                    sequenciaLancamento[i] = cnabTitulos.getValueAt(i, 2).toString();
+                    detail[9] = cnabTitulos.getValueAt(i, 3).toString(); //identicicação do título
+                    detail[10] = cnabTitulos.getValueAt(i, 2).toString(); // nosso número
+                    detail[16] = cnabTitulos.getValueAt(i, 4).toString(); // Numero documento de Cobrança (Dupl, NP, Etc.)
+                    String vcto = dat.getDataConv(Date.valueOf(cnabTitulos.getValueAt(i, 5).toString())).replaceAll("/", "");
                     detail[17] = String.format("%s%s", vcto.substring(0, 4), vcto.substring(6)); // Vencimento
                     cnab.setDataVencimento(vcto);
-                    String valor = cm.getValueAt(i, 6).toString().replace(",", "");
+                    String valor = cnabTitulos.getValueAt(i, 6).toString().replace(",", "");
                     detail[18] = valor.replace(".", ""); // Valor nominal do Título
-                    String emis = dat.getDataConv(Date.valueOf(cm.getValueAt(i, 7).toString())).replaceAll("/", "");
+                    String emis = dat.getDataConv(Date.valueOf(cnabTitulos.getValueAt(i, 7).toString())).replaceAll("/", "");
                     detail[23] = String.format("%s%s", emis.substring(0, 4), emis.substring(6)); // Data da emissao do título
-                    String jurosdia = cm.getValueAt(i, 8).toString().replace(",", "");
+                    String jurosdia = cnabTitulos.getValueAt(i, 8).toString().replace(",", "");
                     detail[26] = jurosdia.replace(".", "");// juros de 1 dia
-                    detail[31] = cm.getValueAt(i, 9).toString(); // identificação do tipo de inscrição do pagador (01-CPF / 02-CNPJ)
-                    detail[32] = cm.getValueAt(i, 10).toString(); // Número de inscrição do pagador (CPF / CNPJ)
-                    detail[33] = cm.getValueAt(i, 11).toString(); // Nome do Pagador
-                    detail[35] = cm.getValueAt(i, 12).toString(); // Logradouro do Pagador
-                    detail[36] = cm.getValueAt(i, 13).toString(); // Bairro do Pagador
-                    detail[37] = cm.getValueAt(i, 14).toString(); // CEP do Pagador
-                    detail[38] = cm.getValueAt(i, 15).toString(); // Cidade do Pagador
-                    detail[39] = cm.getValueAt(i, 16).toString(); // UF do Pagador
+                    detail[31] = cnabTitulos.getValueAt(i, 9).toString(); // identificação do tipo de inscrição do pagador (01-CPF / 02-CNPJ)
+                    detail[32] = cnabTitulos.getValueAt(i, 10).toString(); // Número de inscrição do pagador (CPF / CNPJ)
+                    detail[33] = cnabTitulos.getValueAt(i, 11).toString(); // Nome do Pagador
+                    detail[35] = cnabTitulos.getValueAt(i, 12).toString().trim(); // Logradouro do Pagador
+                    detail[36] = cnabTitulos.getValueAt(i, 13).toString().trim(); // Bairro do Pagador
+                    detail[37] = cnabTitulos.getValueAt(i, 14).toString(); // CEP do Pagador
+                    detail[38] = cnabTitulos.getValueAt(i, 15).toString(); // Cidade do Pagador
+                    detail[39] = cnabTitulos.getValueAt(i, 16).toString(); // UF do Pagador
                     detail[42] = detail[17];
                     detail[43] = "66";
                     detail[45] = String.valueOf(idxArq);
                     arquivo[idxArq - 1] = cpc.posicionarCampos(detail, tipo, tamanho);
                     idxArq++;
-                    double valorMulta = (cnab.getTaxaMulta() * Double.valueOf(String.valueOf(cm.getValueAt(i, 6)).replace(".", "").replace(",", "."))) / 100;
+                    double valorMulta = (cnab.getTaxaMulta() * Double.valueOf(String.valueOf(cnabTitulos.getValueAt(i, 6)).replace(".", "").replace(",", "."))) / 100;
+                    System.out.println();
+                    System.out.println("Valor titulo: " + cnabTitulos.getValueAt(i, 6));
+                    System.out.println("Valor da multa: " + df.format(valorMulta));
+                    System.out.println("Taxa multa: " + cnab.getTaxaMulta());
                     if (cnab.getTaxaMulta() > 0) {
-                        cnab.setValorMulta(String.valueOf(valorMulta).replace(".", ""));
+                        cnab.setValorMulta(String.valueOf(df.format(valorMulta)).replace(".", "").toString().replace(",",""));
                         cnab.setCdTipoRegistro("2");
                         if (criarDetalheMultaItau() != 1) {
                             return 0;
@@ -342,7 +355,7 @@ public class CArquivoCNAB {
         int[] tamanho = {1, 1, 8, 13, 370, 6};
         String[] detail = new String[tamanho.length];
         detail = formatarString(cnab, cnab.getCdTipoRegistro());
-        detail[3] = cnab.getValorMulta().substring(0, 4);
+        detail[3] = cnab.getValorMulta().substring(0, cnab.getValorMulta().length());
         detail[5] = String.valueOf(idxArq);
         arquivo[idxArq - 1] = cpc.posicionarCampos(detail, tipo, tamanho);
         idxArq++;
@@ -363,6 +376,39 @@ public class CArquivoCNAB {
         int[] tamanho = {1, 393, 6};
         String trailer = "";
         arquivo[idxArq - 1] = cpc.posicionarCampos(campos, tipo, tamanho);
+        return 1;
+    }
+
+    /**
+     * Método para atualizar o lancamento para arquivo gerado = "S"
+     *
+     * @param sequenciaLancamento
+     * @return
+     */
+    public int atualizarLancamento() {
+        Lancamentos lan = new Lancamentos();
+        CLancamentos clan = new CLancamentos(conexao, su);
+        for (int i = 0; i < cnabTitulos.getRowCount(); i++) {
+            String sqlLan = "select * from gfclancamentos where sequencial = " + sequenciaLancamento[i];
+            try {
+                if (clan.pesquisar(sqlLan) == 1) {
+                    DataSistema dat = new DataSistema();
+                    dat.setData("");
+                    HoraSistema hs = new HoraSistema();
+                    clan.mostrarPesquisa(lan, 0);
+                    lan.setGerouArquivo("S");
+                    lan.setNossoNumeroBanco(cnabTitulos.getValueAt(i, 2).toString());
+                    lan.setUsuarioModificacao(su.getUsuarioConectado());
+                    lan.setDataModificacao(dat.getData());
+                    lan.setHoraModificacao(hs.getHora());
+                    LancamentosDAO lanDao = new LancamentosDAO(conexao);
+                    lanDao.atualizar(lan);
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(CArquivoCNAB.class.getName()).log(Level.SEVERE, null, ex);
+                return 0;
+            }
+        }
         return 1;
     }
 
@@ -429,7 +475,7 @@ public class CArquivoCNAB {
     }
 
     /**
-     * Método para gerar a Stringo contendo os campos do cabecalho
+     * Método para gerar a String contendo os campos do cabecalho
      *
      * @param cnab objeto contendo o conteudo a ser gerado no arquivo
      * @return vetor de String contendo os campos do cabecalho
@@ -444,7 +490,7 @@ public class CArquivoCNAB {
             String[] detail = new String[46];
             formatarDetalheItau(detail);
             campos = detail;
-        } else {
+        } else if("2".equals(registro)) {
             String[] detail = new String[6];
             formatarDetalheMultaItau(detail);
             campos = detail;
@@ -582,7 +628,7 @@ public class CArquivoCNAB {
                 String.format("%s", Double.valueOf(String.format("%s%s%s", detalhe[33].substring(0, 11), ".", detalhe[33].substring(11, 13)))),
                 String.format("%s", Double.valueOf(String.format("%s%s%s", detalhe[34].substring(0, 11), ".", detalhe[34].substring(11, 13)))),
                 detalhe[35],
-                detalhe[37],
+                String.format("%s%s%s%s%s", this.detalhe[37].substring(0, 2), "/", this.detalhe[37].substring(2, 4), "/20", this.detalhe[37].substring(4, 6)),
                 detalhe[38],
                 detalhe[41],
                 detalhe[43],
@@ -602,21 +648,22 @@ public class CArquivoCNAB {
         buscarOcorencia();
         return regAtual;
     }
-    
-    private void buscarOcorencia(){
+
+    private void buscarOcorencia() {
         EdiOcorrencia eo = new EdiOcorrencia();
         try {
-            CEdiOcorrencia ceo = new CEdiOcorrencia(conexao,su);
-            String sqleo = "SELECT * FROM GFCEDIOCORRENCIA WHERE CD_BANCO = '" + regAtual.getCdBanco() + 
-                    "' AND CD_OCORRENCIA = '" + regAtual.getCdOcorrencia() + 
-                    "'";
+            CEdiOcorrencia ceo = new CEdiOcorrencia(conexao, su);
+            String sqleo = "SELECT * FROM GFCEDIOCORRENCIA WHERE CD_BANCO = '" + regAtual.getCdBanco()
+                    + "' AND CD_OCORRENCIA = '" + regAtual.getCdOcorrencia()
+                    + "'";
             ceo.pesquisar(sqleo);
             ceo.mostrarPesquisa(eo, 0);
             regAtual.setDescricaoOcorrencia(eo.getNomeOcorrencia());
-            if("S".equals(eo.getLiquidarTitulo())){
+            if ("S".equals(eo.getLiquidarTitulo())) {
                 regAtual.setOcorrenciaLiquidaTitulo(true);
-            }else
+            } else {
                 regAtual.setOcorrenciaLiquidaTitulo(false);
+            }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Erro na busca do Nome do Banco!\nPrograma CEdiOcorrencia.\nErro: " + ex);
         }

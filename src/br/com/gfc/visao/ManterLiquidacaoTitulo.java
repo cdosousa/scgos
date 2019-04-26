@@ -48,6 +48,9 @@ public class ManterLiquidacaoTitulo extends javax.swing.JDialog {
     // Variáveis de instância da classe
     private static String cdLancamento;
     private String sql;
+    private String valorPago;
+    private String dataLiquidacao;
+    private boolean liquidacaoCnab = false;
 
     /**
      * Contrututor padrão da classe
@@ -71,22 +74,26 @@ public class ManterLiquidacaoTitulo extends javax.swing.JDialog {
                 + "'";
         buscarLancamento();
     }
-    
+
     /**
      * Construto padrão para gerar a liquidação do título via retorno de EDI
+     *
      * @param parent
      * @param modal
      * @param conexao
      * @param su
      * @param cdLancamento
      * @param valorLiquidacao
-     * @param dataLiquidacao 
+     * @param dataLiquidacao
      */
-    public ManterLiquidacaoTitulo(java.awt.Frame parent, boolean modal, Connection conexao, SessaoUsuario su, String cdLancamento, String valorLiquidacao, String dataLiquidacao) {
+    public ManterLiquidacaoTitulo(java.awt.Frame parent, boolean modal, Connection conexao, SessaoUsuario su, String cdLancamento, boolean liquidacaoCbab, double valorLiquidacao, String dataLiquidacao) {
         super(parent, modal);
         this.conexao = conexao;
         this.su = su;
         this.cdLancamento = cdLancamento;
+        this.liquidacaoCnab = liquidacaoCbab;
+        this.valorPago = String.valueOf(valorLiquidacao);
+        this.dataLiquidacao = dataLiquidacao;
         initComponents();
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -96,8 +103,7 @@ public class ManterLiquidacaoTitulo extends javax.swing.JDialog {
         sql = "select * from gfclancamentos where cd_lancamento = '" + cdLancamento
                 + "'";
         buscarLancamento();
-        jForValorPago.setText(valorLiquidacao);
-        jForDataLiquidacao.setText(dataLiquidacao);
+        JOptionPane.showMessageDialog(null, "ValorLiquidacao: " + valorLiquidacao + "\nData Liquidacao: " + dataLiquidacao);
     }
 
     private void formatarCampos() {
@@ -187,6 +193,10 @@ public class ManterLiquidacaoTitulo extends javax.swing.JDialog {
                 modlan.setTipoLancamento("Tit");
                 break;
         }
+        if (liquidacaoCnab) {
+            jForValorPago.setText(valorPago.toString());
+            jForDataLiquidacao.setText(dataLiquidacao.replace("-", "/"));
+        }
     }
 
     /**
@@ -229,12 +239,12 @@ public class ManterLiquidacaoTitulo extends javax.swing.JDialog {
         String dataLiquidacao = jForDataLiquidacao.getText();
         try {
             valorPago = formato.parse(jForValorPago.getText()).doubleValue();
-            valorAtual = formato.parse(jForValorLancamento.getText()).doubleValue();
+            valorAtual = formato.parse(jForValorSaldo.getText()).doubleValue();
             if (valorPago >= valorAtual) {
                 valorSaldo = 0.00;
                 situacaoParcela = "LI";
             } else {
-                valorSaldo = valorAtual - valorPago;
+                valorSaldo = (valorAtual - valorPago);
                 situacaoParcela = "AB";
             }
         } catch (ParseException ex) {
@@ -247,23 +257,26 @@ public class ManterLiquidacaoTitulo extends javax.swing.JDialog {
             buscarLancamento();
         }
     }
-    
+
     /**
      * Método para pesquisar históricos financeiros
      */
-    private void zoomHistorico(){
+    private void zoomHistorico() {
         PesquisarHistoricos zoom = new PesquisarHistoricos(new JFrame(), rootPaneCheckingEnabled, "P", conexao, su);
         zoom.setVisible(rootPaneCheckingEnabled);
-        if(zoom.isSalvar()){
+        if (zoom.isSalvar()) {
             Historico hs = zoom.getHt();
             jTexCdHistorico.setText(hs.getCdHistorico());
             String ch = hs.getNomeHistorico();
-            if("1".equals(hs.getDocumentoComplementa()))
+            if ("1".equals(hs.getDocumentoComplementa())) {
                 ch = String.format("%s", ch.trim() + " - Documento: " + jForCdTitulo.getText());
-            if("1".equals(hs.getEmpresaComplementa()))
+            }
+            if ("1".equals(hs.getEmpresaComplementa())) {
                 ch = String.format("%s", ch.trim() + " - Empresa: " + jTexNomeCliente.getText());
-            if("1".equals(hs.getEmissaoComplementa()))
+            }
+            if ("1".equals(hs.getEmissaoComplementa())) {
                 ch = String.format("%s", ch.trim() + " - Emissão: " + jForDataEmissao.getText());
+            }
             jTextAreaComplementoHistorico.setText(ch.trim());
         }
     }
@@ -600,8 +613,9 @@ public class ManterLiquidacaoTitulo extends javax.swing.JDialog {
 
     private void jTexCdHistoricoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTexCdHistoricoKeyPressed
         VerificarTecla vt = new VerificarTecla();
-        if("F5".equals(vt.VerificarTecla(evt)))
+        if ("F5".equals(vt.VerificarTecla(evt))) {
             zoomHistorico();
+        }
     }//GEN-LAST:event_jTexCdHistoricoKeyPressed
 
     /**

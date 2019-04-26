@@ -35,7 +35,7 @@ public class PortadoresDAO extends AbstractTableModel {
     // método construtor da classe para inicializar a conexão
     public PortadoresDAO(Connection conexao) throws SQLException {
         this.conexao = conexao;
-        stmt = conexao.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        stmt = this.conexao.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         statusConexao = true;
     }
     

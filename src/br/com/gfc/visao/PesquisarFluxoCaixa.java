@@ -155,23 +155,24 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
             //mensagem(sqlTitulo);
             ttdao = new ConsultaTitulos(conexao);
             ttdao.setQuery(sqlTitulo);
-            jTabTitulo.setModel(ttdao);
-            alinharTabela(jTabTitulo, 8, 11, 12);
-            ttdao.ajustarTabela(jTabTitulo, 30, 5, 5, 5, 30, 200, 20, 5, 20, 30, 30, 20, 20, 20);
-            jForTotPrevReceber.setText(String.valueOf(ttdao.getTotPrevisaoRec()));
-            jForTotTitReceber.setText(String.valueOf(ttdao.getTotTitulosRec()));
-            jForTotPrevPagar.setText(String.valueOf(ttdao.getTotPrevisaoPag()));
-            jForTotTitPagar.setText(String.valueOf(ttdao.getTotTitulosPag()));
-        } catch (SQLException ex) {
+            if (ttdao.getRowCount() > 0) {
+                jTabTitulo.setModel(ttdao);
+                alinharTabela(jTabTitulo, 8, 11, 12);
+                ttdao.ajustarTabela(jTabTitulo, 30, 5, 5, 5, 30, 200, 20, 5, 20, 30, 30, 20, 20, 20);
+                jForTotPrevReceber.setText(String.valueOf(ttdao.getTotPrevisaoRec()));
+                jForTotTitReceber.setText(String.valueOf(ttdao.getTotTitulosRec()));
+                jForTotPrevPagar.setText(String.valueOf(ttdao.getTotPrevisaoPag()));
+                jForTotTitPagar.setText(String.valueOf(ttdao.getTotTitulosPag()));
+            }
+            }catch (SQLException ex) {
             mensagem("Erro na busca dos Títulos Financeiro!\nErro: " + ex);
-        } catch (Exception ex) {
+        }catch (Exception ex) {
             mensagem("Erro geral na busca dos Títulos!\nErro: " + ex);
         }
-    }
-
-    /**
-     * Método para buscar total de títulos por clientes
-     */
+        }
+        /**
+         * Método para buscar total de títulos por clientes
+         */
     private void buscarTotalCliente() {
         linhaClientes = 0;
         try {
@@ -334,7 +335,7 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
                             zoomTitulos(sql);
                             break;
                         case "5":
-                            sql = "select * from buscartitulos where tipo = '"+ tpMov
+                            sql = "select * from buscartitulos where tipo = '" + tpMov
                                     + "' and TpLanc = '" + tpLanc
                                     + "' and Situacao = 'Aberto'"
                                     + " and Vencimento > (NOW() + INTERVAL 90 DAY)";
