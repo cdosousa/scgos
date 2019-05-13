@@ -164,15 +164,16 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
                 jForTotPrevPagar.setText(String.valueOf(ttdao.getTotPrevisaoPag()));
                 jForTotTitPagar.setText(String.valueOf(ttdao.getTotTitulosPag()));
             }
-            }catch (SQLException ex) {
+        } catch (SQLException ex) {
             mensagem("Erro na busca dos Títulos Financeiro!\nErro: " + ex);
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             mensagem("Erro geral na busca dos Títulos!\nErro: " + ex);
         }
-        }
-        /**
-         * Método para buscar total de títulos por clientes
-         */
+    }
+
+    /**
+     * Método para buscar total de títulos por clientes
+     */
     private void buscarTotalCliente() {
         linhaClientes = 0;
         try {
@@ -422,6 +423,8 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
         jPanCliente = new javax.swing.JPanel();
         jLabNomeCliente = new javax.swing.JLabel();
         jTexNomeCliente = new javax.swing.JTextField();
+        jLabHistorico = new javax.swing.JLabel();
+        jTexHistorico = new javax.swing.JTextField();
         jForDatVencimentoFin = new javax.swing.JFormattedTextField();
         jLabTipoLancamento = new javax.swing.JLabel();
         jLabDataEmissao = new javax.swing.JLabel();
@@ -599,7 +602,7 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButAtualizarVisao)
-                .addContainerGap())
+                .addContainerGap(55, Short.MAX_VALUE))
         );
 
         jPanTitulos.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Títulos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 13))); // NOI18N
@@ -751,7 +754,7 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
             ex.printStackTrace();
         }
 
-        jPanCliente.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Cliente", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 13))); // NOI18N
+        jPanCliente.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Filtros:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 13))); // NOI18N
 
         jLabNomeCliente.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabNomeCliente.setText("Nome:");
@@ -762,16 +765,29 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
             }
         });
 
+        jLabHistorico.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabHistorico.setText("Histórico:");
+
+        jTexHistorico.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTexHistoricoKeyReleased(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanClienteLayout = new javax.swing.GroupLayout(jPanCliente);
         jPanCliente.setLayout(jPanClienteLayout);
         jPanClienteLayout.setHorizontalGroup(
             jPanClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanClienteLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabNomeCliente)
+                .addContainerGap(27, Short.MAX_VALUE)
+                .addGroup(jPanClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabHistorico, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabNomeCliente, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTexNomeCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 479, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addGroup(jPanClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jTexNomeCliente, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 430, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTexHistorico, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 430, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
         jPanClienteLayout.setVerticalGroup(
             jPanClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -780,6 +796,10 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
                 .addGroup(jPanClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabNomeCliente)
                     .addComponent(jTexNomeCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabHistorico)
+                    .addComponent(jTexHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -880,11 +900,12 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
                         .addGroup(jPanFiltrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel5)
                             .addComponent(jForDatVencimentoIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jForDatVencimentoFin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jForDatVencimentoFin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanFiltrosLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanCliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(jPanCliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
 
         jPanTotaisTitulos.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Total em lançamentos abertos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 13))); // NOI18N
@@ -930,7 +951,7 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
                     .addComponent(jLabTotTitPagar, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanTotaisTitulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jForTotPrevReceber, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)
+                    .addComponent(jForTotPrevReceber, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
                     .addComponent(jForTotTitReceber)
                     .addComponent(jForTotPrevPagar)
                     .addComponent(jForTotTitPagar))
@@ -981,9 +1002,9 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
                         .addGap(2, 2, 2))
                     .addGroup(jPanTitulosLayout.createSequentialGroup()
                         .addComponent(jPanTotaisTitulos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(1, 1, 1)))
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(5, 5, 5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(jPanBotoesTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -1098,8 +1119,8 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
         jPanForcedoresLayout.setVerticalGroup(
             jPanForcedoresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanForcedoresLayout.createSequentialGroup()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanGeralLayout = new javax.swing.GroupLayout(jPanGeral);
@@ -1126,8 +1147,8 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
                     .addGroup(jPanGeralLayout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanForcedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanVisaoFinaceira, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jPanForcedores, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanVisaoFinaceira, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanTitulos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1251,6 +1272,30 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
         exportarTítulos();
     }//GEN-LAST:event_jButExportExcelActionPerformed
 
+    private void jTexHistoricoKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTexHistoricoKeyReleased
+        // TODO add your handling code here:
+        if (!jTexHistorico.getText().isEmpty()) {
+            sqlTitulo = "select b.Lancamento, b.Tipo, b.TpDoc, b.TpLanc,b.Emissao, b.Cliente, b.Titulo, b.Parc, b.Valor, b.Vencimento, b.Liquidacao, b.Valor Liq, b.Saldo, b.Situacao "
+                    + "from buscartitulos as b"
+                    + " left outer join gfclancamentos as l on b.lancamento = l.cd_lancamento"
+                    + " where b.Situacao between '" + situacaoIni
+                    + "' and '" + situacaoFin
+                    + "' and b.Tipo between '" + pagarReceberIni
+                    + "' and '" + pagarReceberFin
+                    + "' and b.Emissao between '" + dat.getDataConv(jForDatEmissaoIni.getText())
+                    + "' and '" + dat.getDataConv(jForDatEmissaoFin.getText())
+                    + "' and b.Vencimento between '" + dat.getDataConv(jForDatVencimentoIni.getText())
+                    + "' and '" + dat.getDataConv(jForDatVencimentoFin.getText())
+                    + "' and b.TpLanc between '" + tipoLancametoIni
+                    + "' and '" + tipoLancametoFin
+                    + "' and l.complemento_historico like '%" + jTexHistorico.getText().trim()
+                    + "%'";
+        } else {
+            jButBuscar.doClick();
+        }
+        buscarTitulos();
+    }//GEN-LAST:event_jTexHistoricoKeyReleased
+
     /**
      * @param args the command line arguments
      */
@@ -1304,6 +1349,7 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
     private javax.swing.JFormattedTextField jForTotTitPagar;
     private javax.swing.JFormattedTextField jForTotTitReceber;
     private javax.swing.JLabel jLabDataEmissao;
+    private javax.swing.JLabel jLabHistorico;
     private javax.swing.JLabel jLabNomeCliente;
     private javax.swing.JLabel jLabPagarReceber;
     private javax.swing.JLabel jLabSituacao;
@@ -1337,6 +1383,7 @@ public class PesquisarFluxoCaixa extends javax.swing.JFrame {
     private javax.swing.JTable jTabFluxo;
     private javax.swing.JTable jTabFornec;
     private javax.swing.JTable jTabTitulo;
+    private javax.swing.JTextField jTexHistorico;
     private javax.swing.JTextField jTexNomeCliente;
     // End of variables declaration//GEN-END:variables
 }
